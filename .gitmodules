@@ -1,0 +1,3 @@
+[submodule "tracking/UnityStudio"]
+	path = tracking/UnityStudio
+	url = https://github.com/Perfare/UnityStudio

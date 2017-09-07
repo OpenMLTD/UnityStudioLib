@@ -1,0 +1,11 @@
+.vs/
+.idea/
+_Re[Ss]harper*
+*.sln.iml
+
+[Bb]in/
+[Oo]bj/
+
+packages/
+
+*.DotSettings.user
