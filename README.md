@@ -8,7 +8,7 @@ Requires .NET Framework 4.5.
 ## Building
 
 ```bash
-git clone https://github.com/hozuki/UnityStudioLib.git --recursive
+git clone https://github.com/OpenMLTD/UnityStudioLib.git --recursive
 cd UnityStudioLib
 nuget restore UnityStudioLib.sln
 msbuild UnityStudioLib.sln /p:Configuration=Release
