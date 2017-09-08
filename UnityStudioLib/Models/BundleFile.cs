@@ -4,7 +4,6 @@ using LZ4;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Noemax.Compression;
 using UnityStudio.Extensions;
 
 namespace UnityStudio.Models {
@@ -130,12 +129,10 @@ namespace UnityStudio.Models {
                 case "\xFA\xFA\xFA\xFA\xFA\xFA\xFA\xFA":
                     var lzmaBuffer = new byte[lzmaSize];
                     reader.Read(lzmaBuffer, 0, lzmaSize);
-
-                    using (var memoryStream = new MemoryStream(lzmaBuffer, false)) {
-                        using (var decompressionStream = CompressionFactory.Lzma.CreateInputStream(memoryStream)) {
-                            using (var r = new EndianBinaryReader(decompressionStream, Endian.BigEndian)) {
-                                return FillAssetsFilesFromOldFormat(r, 0);
-                            }
+                    var decompressedBytes = SevenZip.Compression.LZMA.SevenZipHelper.Decompress(lzmaBuffer);
+                    using (var memoryStream = new MemoryStream(decompressedBytes, false)) {
+                        using (var r = new EndianBinaryReader(memoryStream, Endian.BigEndian)) {
+                            return FillAssetsFilesFromOldFormat(r, 0);
                         }
                     }
                 case "UnityRaw":
@@ -172,7 +169,7 @@ namespace UnityStudio.Models {
                     extraStream = new MemoryStream(blocksInfoBytes, false);
                     break;
                 case 1:
-                    rawBytes = CompressionFactory.Lzma.Decompress(blocksInfoBytes);
+                    rawBytes = SevenZip.Compression.LZMA.SevenZipHelper.Decompress(blocksInfoBytes);
                     extraStream = new MemoryStream(rawBytes, false);
                     break;
                 case 2:
@@ -201,7 +198,7 @@ namespace UnityStudio.Models {
                                 assetsDataStream.Write(compressedBytes, 0, compressedSize);
                                 break;
                             case 1:
-                                uncompressedBytes = CompressionFactory.Lzma.Decompress(compressedBytes);
+                                uncompressedBytes = SevenZip.Compression.LZMA.SevenZipHelper.Decompress(compressedBytes);
                                 assetsDataStream.Write(uncompressedBytes, 0, uncompressedSize);
                                 break;
                             case 2:

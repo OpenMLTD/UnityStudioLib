@@ -36,8 +36,8 @@
     <Reference Include="LZ4, Version=1.0.15.93, Culture=neutral, PublicKeyToken=62e1b5ec1eec9bdd, processorArchitecture=MSIL">
       <HintPath>..\packages\lz4net.1.0.15.93\lib\net4-client\LZ4.dll</HintPath>
     </Reference>
-    <Reference Include="Noemax.Compression.Net4.Trial, Version=17.231.0.0, Culture=neutral, PublicKeyToken=4c0defa954f97f18, processorArchitecture=MSIL">
-      <HintPath>..\packages\Noemax.Compression.17.231.0\lib\net40\Noemax.Compression.Net4.Trial.dll</HintPath>
+    <Reference Include="SevenZip, Version=9.20.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LZMA-SDK.9.20\lib\net20\SevenZip.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -85,6 +85,7 @@
     <Compile Include="Serialization\Naming\CamelCaseNamingConvetion.cs" />
     <Compile Include="Serialization\Naming\INamingConvention.cs" />
     <Compile Include="Serialization\PopulationStrategy.cs" />
+    <Compile Include="External\SevenZipHelper.cs" />
     <Compile Include="SystemEndian.cs" />
     <Compile Include="Unity\MonoBehavior.cs" />
     <Compile Include="Unity\PPtr.cs" />
