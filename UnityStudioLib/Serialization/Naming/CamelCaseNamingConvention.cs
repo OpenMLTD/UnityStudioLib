@@ -1,7 +1,7 @@
 namespace UnityStudio.Serialization.Naming {
-    public sealed class CamelCaseNamingConvetion : INamingConvention {
+    public sealed class CamelCaseNamingConvention : INamingConvention {
 
-        private CamelCaseNamingConvetion() {
+        private CamelCaseNamingConvention() {
         }
 
         public string GetCorrected(string input) {
