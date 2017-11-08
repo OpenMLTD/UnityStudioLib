@@ -82,7 +82,7 @@
     <Compile Include="Serialization\MonoBehaviorIgnoreAttribute.cs" />
     <Compile Include="Serialization\MonoBehaviorPropertyAttribute.cs" />
     <Compile Include="Serialization\MonoBehaviorSerializer.cs" />
-    <Compile Include="Serialization\Naming\CamelCaseNamingConvetion.cs" />
+    <Compile Include="Serialization\Naming\CamelCaseNamingConvention.cs" />
     <Compile Include="Serialization\Naming\INamingConvention.cs" />
     <Compile Include="Serialization\PopulationStrategy.cs" />
     <Compile Include="External\SevenZipHelper.cs" />
