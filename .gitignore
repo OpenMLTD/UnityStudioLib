@@ -9,3 +9,5 @@ _Re[Ss]harper*
 packages/
 
 *.DotSettings.user
+*.sln.user
+*.csproj.user

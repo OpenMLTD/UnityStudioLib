@@ -134,6 +134,10 @@ namespace UnityStudio.Serialization {
                             var collection = ctor.Invoke(null);
                             var addMethod = arrayType.GetMethod("Add", InternalBindings);
 
+                            if (addMethod == null) {
+                                throw new InvalidCastException("The type is not a collection.");
+                            }
+
                             if (varArray.Count == 0) {
                                 propOrField.SetValue(obj, collection);
                             } else {
@@ -168,10 +172,60 @@ namespace UnityStudio.Serialization {
                 } else {
                     // It is a primitive value.
 
-                    if (kv.Value is byte b && propOrField.GetValueType() == typeof(bool)) {
-                        propOrField.SetValue(obj, b != 0);
-                    } else {
+                    var acceptedType = propOrField.GetValueType();
+                    var serializedValueType = kv.Value.GetType();
+
+                    if (serializedValueType == acceptedType) {
                         propOrField.SetValue(obj, kv.Value);
+                    } else {
+                        // A little convertion is needed here...
+                        var converted = false;
+
+                        do {
+                            if (kv.Value is byte b && acceptedType == typeof(bool)) {
+                                // A special case: Unity uses UInt8 to store booleans.
+                                propOrField.SetValue(obj, b != 0);
+                                converted = true;
+
+                                break;
+                            }
+
+                            var converterType = propOrField.Attribute?.ConverterType;
+
+                            if (converterType == null) {
+                                // No specified converter found, then fail.
+                                break;
+                            }
+
+                            if (!converterType.ImplementsInterface(typeof(ISimpleTypeConverter))) {
+                                throw new ArgumentException("Converter does not implement " + nameof(ISimpleTypeConverter) + ".");
+                            }
+
+                            ISimpleTypeConverter converter;
+
+                            // Retrieve or create specified converter.
+                            if (_createdTypeConverters.ContainsKey(converterType)) {
+                                converter = _createdTypeConverters[converterType];
+                            } else {
+                                converter = (ISimpleTypeConverter)Activator.CreateInstance(converterType);
+                                _createdTypeConverters[converterType] = converter;
+                            }
+
+                            if (!converter.CanConvertFrom(serializedValueType) || !converter.CanConvertTo(acceptedType)) {
+                                // If the converter cannot handle desired conversion, fail.
+                                break;
+                            }
+
+                            var convertedValue = converter.ConvertTo(kv.Value, acceptedType);
+
+                            propOrField.SetValue(obj, convertedValue);
+
+                            converted = true;
+                        } while (false);
+
+                        if (!converted) {
+                            throw new InvalidCastException($"Serialized type {serializedValueType} cannot be converted to {acceptedType}.");
+                        }
                     }
                 }
             }
@@ -179,22 +233,20 @@ namespace UnityStudio.Serialization {
             return obj;
         }
 
-        private static readonly MonoBehaviorAttribute DefaultClassOptions = new MonoBehaviorAttribute();
-
         private static PropertyOrField FindByName(IReadOnlyList<PropertyInfo> properties, IReadOnlyList<FieldInfo> fields, string name, INamingConvention namingConvention) {
             foreach (var prop in properties) {
                 var mbp = prop.GetCustomAttribute<MonoBehaviorPropertyAttribute>();
-                var propName = mbp?.Name ?? (namingConvention != null ? namingConvention.GetCorrected(prop.Name) : prop.Name);
+                var propName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(prop.Name) : prop.Name);
                 if (propName == name) {
-                    return new PropertyOrField(prop);
+                    return new PropertyOrField(prop, mbp);
                 }
             }
 
             foreach (var field in fields) {
                 var mbp = field.GetCustomAttribute<MonoBehaviorPropertyAttribute>();
-                var fieldName = mbp?.Name ?? (namingConvention != null ? namingConvention.GetCorrected(field.Name) : field.Name);
+                var fieldName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(field.Name) : field.Name);
                 if (fieldName == name) {
-                    return new PropertyOrField(field);
+                    return new PropertyOrField(field, mbp);
                 }
             }
 
@@ -202,6 +254,10 @@ namespace UnityStudio.Serialization {
         }
 
         private const BindingFlags InternalBindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        private static readonly MonoBehaviorAttribute DefaultClassOptions = new MonoBehaviorAttribute();
+
+        private readonly Dictionary<Type, ISimpleTypeConverter> _createdTypeConverters = new Dictionary<Type, ISimpleTypeConverter>(10);
 
         private static readonly string[] FilteredNames = {
             "m_GameObject",
@@ -212,16 +268,18 @@ namespace UnityStudio.Serialization {
 
         private struct PropertyOrField {
 
-            internal PropertyOrField(FieldInfo field) {
+            internal PropertyOrField(FieldInfo field, MonoBehaviorPropertyAttribute attribute) {
                 Field = field;
                 Property = null;
                 IsValid = true;
+                Attribute = attribute;
             }
 
-            internal PropertyOrField(PropertyInfo property) {
+            internal PropertyOrField(PropertyInfo property, MonoBehaviorPropertyAttribute attribute) {
                 Field = null;
                 Property = property;
                 IsValid = true;
+                Attribute = attribute;
             }
 
             internal void SetValue(object @this, object value) {
@@ -247,9 +305,14 @@ namespace UnityStudio.Serialization {
 
             internal bool IsValid { get; }
 
+            [CanBeNull]
             internal FieldInfo Field { get; }
 
+            [CanBeNull]
             internal PropertyInfo Property { get; }
+
+            [CanBeNull]
+            internal MonoBehaviorPropertyAttribute Attribute { get; }
 
         }
 

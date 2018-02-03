@@ -2,7 +2,7 @@ using UnityStudio.Serialization;
 using UnityStudio.Serialization.Naming;
 
 namespace UnityStudio.Tests {
-    [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvetion))]
+    [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvention))]
     public sealed class ScoreObject {
 
         [MonoBehaviorProperty(Name = "evts")]
@@ -18,11 +18,11 @@ namespace UnityStudio.Tests {
         [MonoBehaviorProperty(Name = "BGM_offset")]
         public float BgmOffset { get; set; }
 
-        [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvetion))]
+        [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvention))]
         public sealed class EventNoteData {
 
-            [MonoBehaviorProperty(Name = "absTime")]
-            public double AbsoluteTime { get; set; }
+            [MonoBehaviorProperty(Name = "absTime", ConverterType = typeof(DoubleToSingleConverter))]
+            public float AbsoluteTime { get; set; }
 
             public bool Selected { get; set; }
 
@@ -51,9 +51,10 @@ namespace UnityStudio.Tests {
 
             public int EndType { get; set; }
 
-            public double LeadTime { get; set; }
+            [MonoBehaviorProperty(ConverterType = typeof(DoubleToSingleConverter))]
+            public float LeadTime { get; set; }
 
-            [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvetion))]
+            [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvention))]
             public sealed class PolyPoint {
 
                 [MonoBehaviorProperty(Name = "subtick")]
@@ -66,11 +67,11 @@ namespace UnityStudio.Tests {
 
         }
 
-        [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvetion))]
+        [MonoBehavior(NamingConventionType = typeof(CamelCaseNamingConvention))]
         public sealed class EventConductorData {
 
-            [MonoBehaviorProperty(Name = "absTime")]
-            public double AbsoluteTime { get; set; }
+            [MonoBehaviorProperty(Name = "absTime", ConverterType = typeof(DoubleToSingleConverter))]
+            public float AbsoluteTime { get; set; }
 
             public bool Selected { get; set; }
 
@@ -82,7 +83,8 @@ namespace UnityStudio.Tests {
 
             public int Track { get; set; }
 
-            public double Tempo { get; set; }
+            [MonoBehaviorProperty(ConverterType = typeof(DoubleToSingleConverter))]
+            public float Tempo { get; set; }
 
             [MonoBehaviorProperty(Name = "tsigNumerator")]
             public int SignatureNumerator { get; set; }

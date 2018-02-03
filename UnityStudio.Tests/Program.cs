@@ -59,6 +59,9 @@ namespace UnityStudio.Tests {
             if (scoreObj != null) {
                 Console.WriteLine("Total notes: {0}", scoreObj.NoteEvents.Length);
             }
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
 
         private static void ReadAsset(string fileName) {
