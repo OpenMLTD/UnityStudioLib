@@ -90,6 +90,7 @@
     <Compile Include="SystemEndian.cs" />
     <Compile Include="Unity\MonoBehavior.cs" />
     <Compile Include="Unity\PPtr.cs" />
+    <Compile Include="Unity\TextAsset.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

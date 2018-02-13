@@ -9,7 +9,7 @@ namespace UnityStudio.Tests {
     internal static class Program {
 
         private static void Main(string[] args) {
-            if (args.Length == 0) {
+            if (args.Length < 2) {
                 PrintHelp();
                 return;
             }
@@ -23,12 +23,19 @@ namespace UnityStudio.Tests {
             }
 
             extension = extension.ToLowerInvariant();
-            switch (extension) {
-                case ".unity3d":
-                    ReadBundle(fileName);
+            var mode = args[1].ToLowerInvariant();
+
+            if (extension != ".unity3d") {
+                PrintHelp();
+                return;
+            }
+
+            switch (mode) {
+                case "fumen":
+                    ReadFumen(fileName);
                     break;
-                case ".asset":
-                    ReadAsset(fileName);
+                case "costumedb":
+                    ReadCostumeDatabase(fileName);
                     break;
                 default:
                     PrintHelp();
@@ -36,7 +43,7 @@ namespace UnityStudio.Tests {
             }
         }
 
-        private static void ReadBundle(string fileName) {
+        private static void ReadFumen(string fileName) {
             ScoreObject scoreObj = null;
             using (var fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 using (var bundle = new BundleFile(fileStream, false)) {
@@ -60,12 +67,45 @@ namespace UnityStudio.Tests {
                 Console.WriteLine("Total notes: {0}", scoreObj.NoteEvents.Length);
             }
 
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            Wait();
         }
 
-        private static void ReadAsset(string fileName) {
-            // Do nothing
+        private static void ReadCostumeDatabase(string fileName) {
+            string str = null;
+            string pathName = null, name = null;
+
+            using (var fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                using (var bundle = new BundleFile(fileStream, false)) {
+                    foreach (var assetFile in bundle.AssetFiles) {
+                        foreach (var preloadData in assetFile.PreloadDataList) {
+                            if (preloadData.KnownType == KnownClassID.TextAsset) {
+                                var textAsset = preloadData.LoadAsTextAsset(false);
+
+                                name = textAsset.Name;
+                                pathName = textAsset.PathName;
+                                str = textAsset.GetString();
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (str != null && pathName != null && name != null) {
+                Console.WriteLine("Asset name: {0}", name);
+                Console.WriteLine("Asset path: {0}", pathName);
+                Console.WriteLine(str);
+            } else {
+                Console.WriteLine("(The asset is null, maybe the asset bundle does not contain a text asset.");
+            }
+
+            Wait();
+        }
+
+        private static void Wait() {
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
 
         private static void PrintHelp() {
@@ -76,11 +116,12 @@ namespace UnityStudio.Tests {
             var help = $@"
 Usage:
 
-    {title} <file>
+    {title} <file> <mode>
 
 Remarks:
 
-    <file> must end in .unity3d (bundle) or .asset (asset).
+    <file> must end in .unity3d (bundle).
+    <mode> : fumen, costumedb
 ";
             Console.WriteLine(help);
         }
