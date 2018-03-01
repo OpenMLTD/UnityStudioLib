@@ -112,7 +112,11 @@ namespace UnityStudio.Serialization {
                                             var obj1 = Deserialize((IReadOnlyDictionary<string, object>)innerObject, elementType);
                                             array.SetValue(obj1, i);
                                         } else {
-                                            array.SetValue(innerObject, i);
+                                            if (elementType == typeof(bool) && innerObject is byte byt) {
+                                                array.SetValue(byt != 0, i);
+                                            } else {
+                                                array.SetValue(innerObject, i);
+                                            }
                                         }
                                     }
                                 } else {
@@ -165,7 +169,7 @@ namespace UnityStudio.Serialization {
                     } else {
                         // It is an object.
 
-                        var dictType = propOrField.GetType();
+                        var dictType = propOrField.GetValueType();
                         var obj1 = Deserialize(ct, dictType);
                         propOrField.SetValue(obj, obj1);
                     }
