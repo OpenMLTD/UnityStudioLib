@@ -50,11 +50,11 @@ namespace UnityStudio.Tests {
                     foreach (var assetFile in bundle.AssetFiles) {
                         foreach (var preloadData in assetFile.PreloadDataList) {
                             if (preloadData.KnownType == KnownClassID.MonoBehaviour) {
-                                var behavior = preloadData.LoadAsMonoBehavior(true);
-                                if (behavior.Name.Contains("fumen")) {
-                                    behavior = preloadData.LoadAsMonoBehavior(false);
-                                    var serializer = new MonoBehaviorSerializer();
-                                    scoreObj = serializer.Deserialize<ScoreObject>(behavior);
+                                var behaviour = preloadData.LoadAsMonoBehaviour(true);
+                                if (behaviour.Name.Contains("fumen")) {
+                                    behaviour = preloadData.LoadAsMonoBehaviour(false);
+                                    var serializer = new MonobeBaviourSerializer();
+                                    scoreObj = serializer.Deserialize<ScoreObject>(behaviour);
                                     break;
                                 }
                             }

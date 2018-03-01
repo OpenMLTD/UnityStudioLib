@@ -3,7 +3,7 @@ using UnityStudio.Serialization.Naming;
 
 namespace UnityStudio.Serialization {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public sealed class MonoBehaviorAttribute : Attribute {
+    public sealed class MonoBehaviourAttribute : Attribute {
 
         public PopulationStrategy PopulationStrategy { get; set; } = PopulationStrategy.OptOut;
 

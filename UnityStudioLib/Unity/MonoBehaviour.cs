@@ -5,9 +5,9 @@ using UnityStudio.Extensions;
 using UnityStudio.Models;
 
 namespace UnityStudio.Unity {
-    public sealed class MonoBehavior : IAssetObjectContainer {
+    public sealed class MonoBehaviour : IAssetObjectContainer {
 
-        internal MonoBehavior(AssetPreloadData preloadData, bool metadataOnly) {
+        internal MonoBehaviour(AssetPreloadData preloadData, bool metadataOnly) {
             var assetFile = preloadData.Source;
             var reader = assetFile.FileReader;
 

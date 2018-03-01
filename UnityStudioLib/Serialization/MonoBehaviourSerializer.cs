@@ -11,14 +11,14 @@ using UnityStudio.Serialization.Naming;
 using UnityStudio.Unity;
 
 namespace UnityStudio.Serialization {
-    public sealed class MonoBehaviorSerializer {
+    public sealed class MonoBehaviourSerializer {
 
-        public T Deserialize<T>(MonoBehavior monoBehavior) where T : new() {
+        public T Deserialize<T>(MonoBehaviour monoBehavior) where T : new() {
             var ret = Deserialize(monoBehavior, typeof(T));
             return (T)ret;
         }
 
-        public object Deserialize([NotNull] MonoBehavior monoBehavior, [NotNull] Type type) {
+        public object Deserialize([NotNull] MonoBehaviour monoBehavior, [NotNull] Type type) {
             if (monoBehavior == null) {
                 throw new ArgumentNullException(nameof(monoBehavior));
             }
@@ -31,7 +31,7 @@ namespace UnityStudio.Serialization {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            var monoBehaviorAttr = type.GetCustomAttribute<MonoBehaviorAttribute>() ?? DefaultClassOptions;
+            var monoBehaviorAttr = type.GetCustomAttribute<MonoBehaviourAttribute>() ?? DefaultClassOptions;
 
             var allProperties = type.GetProperties(InternalBindings);
             var allFields = type.GetFields(InternalBindings).Where(field => {
@@ -44,12 +44,12 @@ namespace UnityStudio.Serialization {
             IReadOnlyList<FieldInfo> fields;
             switch (monoBehaviorAttr.PopulationStrategy) {
                 case PopulationStrategy.OptIn:
-                    properties = allProperties.Where(prop => prop.GetCustomAttribute<MonoBehaviorPropertyAttribute>() != null).ToArray();
-                    fields = allFields.Where(field => field.GetCustomAttribute<MonoBehaviorPropertyAttribute>() != null).ToArray();
+                    properties = allProperties.Where(prop => prop.GetCustomAttribute<MonoBehaviourPropertyAttribute>() != null).ToArray();
+                    fields = allFields.Where(field => field.GetCustomAttribute<MonoBehaviourPropertyAttribute>() != null).ToArray();
                     break;
                 case PopulationStrategy.OptOut:
-                    properties = allProperties.Where(prop => prop.GetCustomAttribute<MonoBehaviorIgnoreAttribute>() == null).ToArray();
-                    fields = allFields.Where(field => field.GetCustomAttribute<MonoBehaviorIgnoreAttribute>() == null).ToArray();
+                    properties = allProperties.Where(prop => prop.GetCustomAttribute<MonoBehaviourIgnoreAttribute>() == null).ToArray();
+                    fields = allFields.Where(field => field.GetCustomAttribute<MonoBehaviourIgnoreAttribute>() == null).ToArray();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -239,7 +239,7 @@ namespace UnityStudio.Serialization {
 
         private static PropertyOrField FindByName(IReadOnlyList<PropertyInfo> properties, IReadOnlyList<FieldInfo> fields, string name, INamingConvention namingConvention) {
             foreach (var prop in properties) {
-                var mbp = prop.GetCustomAttribute<MonoBehaviorPropertyAttribute>();
+                var mbp = prop.GetCustomAttribute<MonoBehaviourPropertyAttribute>();
                 var propName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(prop.Name) : prop.Name);
                 if (propName == name) {
                     return new PropertyOrField(prop, mbp);
@@ -247,7 +247,7 @@ namespace UnityStudio.Serialization {
             }
 
             foreach (var field in fields) {
-                var mbp = field.GetCustomAttribute<MonoBehaviorPropertyAttribute>();
+                var mbp = field.GetCustomAttribute<MonoBehaviourPropertyAttribute>();
                 var fieldName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(field.Name) : field.Name);
                 if (fieldName == name) {
                     return new PropertyOrField(field, mbp);
@@ -259,7 +259,7 @@ namespace UnityStudio.Serialization {
 
         private const BindingFlags InternalBindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        private static readonly MonoBehaviorAttribute DefaultClassOptions = new MonoBehaviorAttribute();
+        private static readonly MonoBehaviourAttribute DefaultClassOptions = new MonoBehaviourAttribute();
 
         private readonly Dictionary<Type, ISimpleTypeConverter> _createdTypeConverters = new Dictionary<Type, ISimpleTypeConverter>(10);
 
@@ -272,14 +272,14 @@ namespace UnityStudio.Serialization {
 
         private struct PropertyOrField {
 
-            internal PropertyOrField(FieldInfo field, MonoBehaviorPropertyAttribute attribute) {
+            internal PropertyOrField(FieldInfo field, MonoBehaviourPropertyAttribute attribute) {
                 Field = field;
                 Property = null;
                 IsValid = true;
                 Attribute = attribute;
             }
 
-            internal PropertyOrField(PropertyInfo property, MonoBehaviorPropertyAttribute attribute) {
+            internal PropertyOrField(PropertyInfo property, MonoBehaviourPropertyAttribute attribute) {
                 Field = null;
                 Property = property;
                 IsValid = true;
@@ -316,7 +316,7 @@ namespace UnityStudio.Serialization {
             internal PropertyInfo Property { get; }
 
             [CanBeNull]
-            internal MonoBehaviorPropertyAttribute Attribute { get; }
+            internal MonoBehaviourPropertyAttribute Attribute { get; }
 
         }
 

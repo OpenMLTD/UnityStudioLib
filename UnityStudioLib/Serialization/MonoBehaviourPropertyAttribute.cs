@@ -2,7 +2,7 @@ using System;
 
 namespace UnityStudio.Serialization {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public sealed class MonoBehaviorPropertyAttribute : Attribute {
+    public sealed class MonoBehaviourPropertyAttribute : Attribute {
 
         public string Name { get; set; }
 

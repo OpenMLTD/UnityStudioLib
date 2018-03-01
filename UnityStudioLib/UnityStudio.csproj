@@ -79,16 +79,16 @@
     <Compile Include="Models\ClassMember.cs" />
     <Compile Include="Models\SharedAssetInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\MonoBehaviorAttribute.cs" />
-    <Compile Include="Serialization\MonoBehaviorIgnoreAttribute.cs" />
-    <Compile Include="Serialization\MonoBehaviorPropertyAttribute.cs" />
-    <Compile Include="Serialization\MonoBehaviorSerializer.cs" />
+    <Compile Include="Serialization\MonoBehaviourAttribute.cs" />
+    <Compile Include="Serialization\MonoBehaviourIgnoreAttribute.cs" />
+    <Compile Include="Serialization\MonoBehaviourPropertyAttribute.cs" />
+    <Compile Include="Serialization\MonoBehaviourSerializer.cs" />
     <Compile Include="Serialization\Naming\CamelCaseNamingConvention.cs" />
     <Compile Include="Serialization\Naming\INamingConvention.cs" />
     <Compile Include="Serialization\PopulationStrategy.cs" />
     <Compile Include="External\SevenZipHelper.cs" />
     <Compile Include="SystemEndian.cs" />
-    <Compile Include="Unity\MonoBehavior.cs" />
+    <Compile Include="Unity\MonoBehaviour.cs" />
     <Compile Include="Unity\PPtr.cs" />
     <Compile Include="Unity\TextAsset.cs" />
   </ItemGroup>
