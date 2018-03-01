@@ -53,7 +53,7 @@ namespace UnityStudio.Tests {
                                 var behaviour = preloadData.LoadAsMonoBehaviour(true);
                                 if (behaviour.Name.Contains("fumen")) {
                                     behaviour = preloadData.LoadAsMonoBehaviour(false);
-                                    var serializer = new MonobeBaviourSerializer();
+                                    var serializer = new MonoBehaviourSerializer();
                                     scoreObj = serializer.Deserialize<ScoreObject>(behaviour);
                                     break;
                                 }

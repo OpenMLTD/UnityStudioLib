@@ -20,7 +20,7 @@ namespace UnityStudio.Models {
 
         public int Type1 { get; internal set; }
 
-        public ushort Type2 { get; internal set; }
+        public int Type2 { get; internal set; }
 
         public string UniqueID { get; internal set; }
 

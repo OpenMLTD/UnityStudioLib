@@ -240,5 +240,12 @@ namespace UnityStudio.Models {
         LightmapParameters = 1113,
         LightmapSnapshot = 1120,
 
+        SubDerived = 367388927,
+        SiblingDerived = 334799969,
+        SpriteAtlas = 687078895,
+        Derived = 1091556383,
+        LowerResBlitTexture = 1480428607,
+        RenderPassAttachment = 1571458007,
+
     }
 }

@@ -200,17 +200,12 @@ namespace UnityStudio.Models {
 
                 var classIDs = _classIDs ?? (_classIDs = new List<(int Type1, int Type2)>());
                 classIDs.Add((type1, classID));
+
+                if (classID == 114) {
+                    reader.Position += 16;
+                }
+
                 classID = type1;
-
-                var t = reader.ReadInt32();
-                if (t == 0) {
-                    reader.Position += 16;
-                }
-
-                reader.Position -= 4;
-                if (type1 < 0) {
-                    reader.Position += 16;
-                }
             } else if (classID < 0) {
                 reader.Position += 16;
             }
@@ -222,8 +217,7 @@ namespace UnityStudio.Models {
 
                 reader.Position += varCount * 24;
 
-                var varStrings = Encoding.UTF8.GetString(reader.ReadBytes(stringSize));
-                var className = string.Empty;
+                var stringBlockData = reader.ReadBytes(stringSize);
 
                 var classVars = new List<ClassMember>();
                 reader.Position -= varCount * 24 + stringSize;
@@ -231,43 +225,50 @@ namespace UnityStudio.Models {
                 string baseName = null, baseType = null;
                 int baseSize = 0, baseIndex = 0, baseFlags = 0;
 
-                for (var i = 0; i < varCount; ++i) {
-                    var dummy = reader.ReadInt16();
-                    var level = reader.ReadByte();
-                    var isArray = reader.ReadBoolean();
+                using (var stringBlockMemory = new MemoryStream(stringBlockData, false)) {
+                    using (var stringReader = new EndianBinaryReader(stringBlockMemory, Endian.BigEndian)) {
+                        for (var i = 0; i < varCount; ++i) {
+                            var dummy = reader.ReadInt16();
+                            var level = reader.ReadByte();
+                            var isArray = reader.ReadBoolean();
 
-                    var varTypeIndex = reader.ReadUInt16();
-                    var test = reader.ReadUInt16();
-                    string varTypeStr;
+                            var varTypeIndex = reader.ReadUInt16();
+                            var isUserDefinedName = reader.ReadUInt16();
+                            string varTypeStr;
 
-                    if (test == 0) {
-                        varTypeStr = varStrings.Substring(varTypeIndex, varStrings.IndexOf('\0', varTypeIndex) - varTypeIndex);
-                    } else {
-                        varTypeStr = CommonStrings.ContainsKey(varTypeIndex) ? CommonStrings[varTypeIndex] : varTypeIndex.ToString();
-                    }
+                            if (isUserDefinedName == 0) {
+                                stringReader.Position = varTypeIndex;
+                                varTypeStr = stringReader.ReadStringToNull();
+                            } else {
+                                varTypeStr = CommonStrings.ContainsKey(varTypeIndex) ? CommonStrings[varTypeIndex] : varTypeIndex.ToString();
+                            }
 
-                    var varNameIndex = reader.ReadUInt16();
-                    test = reader.ReadUInt16();
-                    string varNameStr;
-                    if (test == 0) {
-                        varNameStr = varStrings.Substring(varNameIndex, varStrings.IndexOf('\0', varNameIndex) - varNameIndex);
-                    } else {
-                        varNameStr = CommonStrings.ContainsKey(varNameIndex) ? CommonStrings[varNameIndex] : varNameIndex.ToString();
-                    }
+                            var varNameIndex = reader.ReadUInt16();
+                            isUserDefinedName = reader.ReadUInt16();
+                            string varNameStr;
 
-                    var size = reader.ReadInt32();
-                    var index = reader.ReadInt32();
-                    var flags = reader.ReadInt32();
+                            if (isUserDefinedName == 0) {
+                                stringReader.Position = varNameIndex;
+                                varNameStr = stringReader.ReadStringToNull();
+                            } else {
+                                varNameStr = CommonStrings.ContainsKey(varNameIndex) ? CommonStrings[varNameIndex] : varNameIndex.ToString();
+                            }
 
-                    if (index == 0) {
-                        baseName = varNameStr;
-                        baseType = varTypeStr;
-                        baseSize = size;
-                        baseIndex = index;
-                        baseFlags = flags;
-                    } else {
-                        var member = new ClassMember(level - 1, baseType, baseName, varTypeStr, varNameStr, size, flags, null);
-                        classVars.Add(member);
+                            var size = reader.ReadInt32();
+                            var index = reader.ReadInt32();
+                            var flags = reader.ReadInt32();
+
+                            if (index == 0) {
+                                baseName = varNameStr;
+                                baseType = varTypeStr;
+                                baseSize = size;
+                                baseIndex = index;
+                                baseFlags = flags;
+                            } else {
+                                var member = new ClassMember(level - 1, baseType, baseName, varTypeStr, varNameStr, size, flags, null);
+                                classVars.Add(member);
+                            }
+                        }
                     }
                 }
 
@@ -304,12 +305,12 @@ namespace UnityStudio.Models {
                 preloadData.Size = reader.ReadInt32();
 
                 int type1;
-                ushort type2;
+                int type2;
                 if (fileFormatVersion > 15) {
                     var index = reader.ReadInt32();
                     var t = _classIDs[index];
                     type1 = t.Type1;
-                    type2 = (ushort)t.Type2;
+                    type2 = t.Type2;
                 } else {
                     type1 = reader.ReadInt32();
                     type2 = reader.ReadUInt16();
@@ -452,6 +453,7 @@ namespace UnityStudio.Models {
             [1006] = "Vector4f",
             [1015] = "m_ScriptingClassIdentifier",
             [1042] = "Gradient",
+            [1051] = "Type*"
         };
 
     }
