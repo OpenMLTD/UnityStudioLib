@@ -185,47 +185,63 @@ namespace UnityStudio.Serialization {
                         // A little convertion is needed here...
                         var converted = false;
 
-                        do {
-                            if (kv.Value is byte b && acceptedType == typeof(bool)) {
-                                // A special case: Unity uses UInt8 to store booleans.
-                                propOrField.SetValue(obj, b != 0);
+                        // Is the situation: target type is an enum, recorded type is a integer type?
+                        if (acceptedType.IsEnum) {
+                            if (serializedValueType == typeof(byte) || serializedValueType == typeof(sbyte) ||
+                                serializedValueType == typeof(ushort) || serializedValueType == typeof(short) ||
+                                serializedValueType == typeof(uint) || serializedValueType == typeof(int) ||
+                                serializedValueType == typeof(ulong) || serializedValueType == typeof(long)) {
+                                var enumValue = Enum.ToObject(acceptedType, kv.Value);
+
+                                propOrField.SetValue(obj, enumValue);
+
                                 converted = true;
-
-                                break;
                             }
+                        }
 
-                            var converterType = propOrField.Attribute?.ConverterType;
+                        if (!converted) {
+                            do {
+                                if (kv.Value is byte b && acceptedType == typeof(bool)) {
+                                    // A special case: Unity uses UInt8 to store booleans.
+                                    propOrField.SetValue(obj, b != 0);
+                                    converted = true;
 
-                            if (converterType == null) {
-                                // No specified converter found, then fail.
-                                break;
-                            }
+                                    break;
+                                }
 
-                            if (!converterType.ImplementsInterface(typeof(ISimpleTypeConverter))) {
-                                throw new ArgumentException("Converter does not implement " + nameof(ISimpleTypeConverter) + ".");
-                            }
+                                var converterType = propOrField.Attribute?.ConverterType;
 
-                            ISimpleTypeConverter converter;
+                                if (converterType == null) {
+                                    // No specified converter found, then fail.
+                                    break;
+                                }
 
-                            // Retrieve or create specified converter.
-                            if (_createdTypeConverters.ContainsKey(converterType)) {
-                                converter = _createdTypeConverters[converterType];
-                            } else {
-                                converter = (ISimpleTypeConverter)Activator.CreateInstance(converterType);
-                                _createdTypeConverters[converterType] = converter;
-                            }
+                                if (!converterType.ImplementsInterface(typeof(ISimpleTypeConverter))) {
+                                    throw new ArgumentException("Converter does not implement " + nameof(ISimpleTypeConverter) + ".");
+                                }
 
-                            if (!converter.CanConvertFrom(serializedValueType) || !converter.CanConvertTo(acceptedType)) {
-                                // If the converter cannot handle desired conversion, fail.
-                                break;
-                            }
+                                ISimpleTypeConverter converter;
 
-                            var convertedValue = converter.ConvertTo(kv.Value, acceptedType);
+                                // Retrieve or create specified converter.
+                                if (_createdTypeConverters.ContainsKey(converterType)) {
+                                    converter = _createdTypeConverters[converterType];
+                                } else {
+                                    converter = (ISimpleTypeConverter)Activator.CreateInstance(converterType);
+                                    _createdTypeConverters[converterType] = converter;
+                                }
 
-                            propOrField.SetValue(obj, convertedValue);
+                                if (!converter.CanConvertFrom(serializedValueType) || !converter.CanConvertTo(acceptedType)) {
+                                    // If the converter cannot handle desired conversion, fail.
+                                    break;
+                                }
 
-                            converted = true;
-                        } while (false);
+                                var convertedValue = converter.ConvertTo(kv.Value, acceptedType);
+
+                                propOrField.SetValue(obj, convertedValue);
+
+                                converted = true;
+                            } while (false);
+                        }
 
                         if (!converted) {
                             throw new InvalidCastException($"Serialized type {serializedValueType} cannot be converted to {acceptedType}.");
