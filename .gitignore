@@ -11,3 +11,5 @@ packages/
 *.DotSettings.user
 *.sln.user
 *.csproj.user
+
+tracking/UnityStudio
