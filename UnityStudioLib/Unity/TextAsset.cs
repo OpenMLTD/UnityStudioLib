@@ -51,9 +51,18 @@ namespace UnityStudio.Unity {
                 Size = scriptSize;
             }
 
-            reader.AlignBy(4);
+            var assetDataVersionNumbers = preloadData.Source.VersionComponents;
 
-            PathName = reader.ReadAlignedString(reader.ReadInt32());
+            // It seems like the "PathName" property was removed in 2017.4.
+            if (assetDataVersionNumbers[0] < 2017 ||
+                (assetDataVersionNumbers[0] == 2017 && assetDataVersionNumbers[1] <= 3)) {
+                reader.AlignBy(4);
+
+                var pathNameDataLength = reader.ReadInt32();
+                PathName = reader.ReadAlignedString(pathNameDataLength);
+            } else {
+                PathName = Name;
+            }
         }
 
         public string Name { get; }
