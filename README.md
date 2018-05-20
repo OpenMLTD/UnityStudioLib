@@ -5,6 +5,9 @@ Only essential parts are implemented.
 
 Requires .NET Framework 4.5.
 
+> None of the repo, the tool, nor the repo owner is affiliated with, or sponsored or authorized by
+> Unity Technologies or its affiliates.
+
 ## Building
 
 ```bash
