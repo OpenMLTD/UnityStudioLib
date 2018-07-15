@@ -88,12 +88,23 @@
     <Compile Include="Serialization\PopulationStrategy.cs" />
     <Compile Include="External\SevenZipHelper.cs" />
     <Compile Include="SystemEndian.cs" />
+    <Compile Include="Unity\Animation\Avatar.cs" />
+    <Compile Include="Unity\Animation\Hand.cs" />
+    <Compile Include="Unity\Animation\Human.cs" />
+    <Compile Include="Unity\Animation\Skeleton.cs" />
+    <Compile Include="Unity\Animation\SkeletonNode.cs" />
+    <Compile Include="Unity\Animation\SkeletonPose.cs" />
+    <Compile Include="Unity\Quaternion.cs" />
+    <Compile Include="Unity\Transform.cs" />
     <Compile Include="Unity\MonoBehaviour.cs" />
     <Compile Include="Unity\PPtr.cs" />
     <Compile Include="Unity\TextAsset.cs" />
+    <Compile Include="Unity\Vector3.cs" />
+    <Compile Include="Unity\Vector4.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

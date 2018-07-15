@@ -8,7 +8,7 @@ using UnityStudio.Models;
 namespace UnityStudio.Unity {
     public sealed class TextAsset {
 
-        public TextAsset([NotNull] AssetPreloadData preloadData, bool metadataOnly) {
+        internal TextAsset([NotNull] AssetPreloadData preloadData, bool metadataOnly) {
             var sourceFile = preloadData.Source;
             var reader = sourceFile.FileReader;
 
@@ -20,7 +20,7 @@ namespace UnityStudio.Unity {
                 var prefabInternal = sourceFile.ReadPPtr();
             }
 
-            Name = reader.ReadAlignedString(reader.ReadInt32());
+            Name = reader.ReadAlignedString();
 
             var scriptSize = reader.ReadInt32();
 
@@ -58,8 +58,7 @@ namespace UnityStudio.Unity {
                 (assetDataVersionNumbers[0] == 2017 && assetDataVersionNumbers[1] <= 3)) {
                 reader.AlignBy(4);
 
-                var pathNameDataLength = reader.ReadInt32();
-                PathName = reader.ReadAlignedString(pathNameDataLength);
+                PathName = reader.ReadAlignedString();
             } else {
                 PathName = Name;
             }

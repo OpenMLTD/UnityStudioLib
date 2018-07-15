@@ -19,8 +19,7 @@ namespace UnityStudio.Unity {
             reader.AlignBy(4);
 
             var script = assetFile.ReadPPtr();
-            var nameLength = reader.ReadInt32();
-            var name = reader.ReadAlignedString(nameLength);
+            var name = reader.ReadAlignedString();
 
             Name = string.IsNullOrEmpty(name) ? $"{preloadData.TypeName} #{preloadData.UniqueID}" : name;
 

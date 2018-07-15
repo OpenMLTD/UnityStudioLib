@@ -2,6 +2,7 @@ using System;
 using JetBrains.Annotations;
 using UnityStudio.Models;
 using UnityStudio.Unity;
+using UnityStudio.Unity.Animation;
 
 namespace UnityStudio.Extensions {
     public static class AssetPreloadDataExtensions {
@@ -22,6 +23,15 @@ namespace UnityStudio.Extensions {
             }
 
             return new TextAsset(preloadData, metadataOnly);
+        }
+
+        [NotNull]
+        public static Avatar LoadAsAvatar([NotNull] this AssetPreloadData preloadData) {
+            if (preloadData.KnownType != KnownClassID.Avatar) {
+                throw new InvalidCastException("The asset preload data is not an Avatar.");
+            }
+
+            return Avatar.ReadFromAssetPreloadData(preloadData);
         }
 
     }
