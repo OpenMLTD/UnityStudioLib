@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -59,6 +61,8 @@
     <Compile Include="Extensions\BinaryReaderExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="External\Half.cs" />
+    <Compile Include="External\HalfHelper.cs" />
     <Compile Include="ISimpleTypeConverter.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Models\AssetFile.cs" />
@@ -94,11 +98,23 @@
     <Compile Include="Unity\Animation\Skeleton.cs" />
     <Compile Include="Unity\Animation\SkeletonNode.cs" />
     <Compile Include="Unity\Animation\SkeletonPose.cs" />
+    <Compile Include="Unity\Mesh.cs" />
+    <Compile Include="Unity\MeshParts\AABB.cs" />
+    <Compile Include="Unity\MeshParts\BlendShapeData.cs" />
+    <Compile Include="Unity\MeshParts\BlendShapeVertex.cs" />
+    <Compile Include="Unity\MeshParts\BoneInfluence.cs" />
+    <Compile Include="Unity\MeshParts\ChannelInfo.cs" />
+    <Compile Include="Unity\MeshParts\MeshBlendShape.cs" />
+    <Compile Include="Unity\MeshParts\MeshBlendShapeChannel.cs" />
+    <Compile Include="Unity\MeshParts\PackedBitVector.cs" />
+    <Compile Include="Unity\MeshParts\StreamInfo.cs" />
+    <Compile Include="Unity\MeshParts\SubMesh.cs" />
     <Compile Include="Unity\Quaternion.cs" />
     <Compile Include="Unity\Transform.cs" />
     <Compile Include="Unity\MonoBehaviour.cs" />
     <Compile Include="Unity\PPtr.cs" />
     <Compile Include="Unity\TextAsset.cs" />
+    <Compile Include="Unity\Vector2.cs" />
     <Compile Include="Unity\Vector3.cs" />
     <Compile Include="Unity\Vector4.cs" />
   </ItemGroup>

@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityStudio.Models;
 using UnityStudio.Unity;
@@ -32,6 +34,21 @@ namespace UnityStudio.Extensions {
             }
 
             return Avatar.ReadFromAssetPreloadData(preloadData);
+        }
+
+        [NotNull]
+        public static Mesh LoadAsMesh([NotNull] this AssetPreloadData preloadData) {
+            if (preloadData.KnownType != KnownClassID.Mesh) {
+                throw new InvalidCastException("The asset preload data is not a Mesh.");
+            }
+
+            return new Mesh(preloadData, false);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool HasStructMember([NotNull] this AssetPreloadData preloadData, [NotNull] string name) {
+            return preloadData.Source.Objects.TryGetValue(preloadData.Type1, out var classStructure)
+                   && classStructure.Children.Any(x => x.Name == name);
         }
 
     }

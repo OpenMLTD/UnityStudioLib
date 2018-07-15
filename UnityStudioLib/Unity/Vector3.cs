@@ -19,9 +19,13 @@ namespace UnityStudio.Unity {
 
         public float Z;
 
-        public static Vector3 Zero { get; } = new Vector3(0);
+        public static readonly Vector3 Zero = new Vector3(0);
 
-        public static Vector3 One { get; } = new Vector3(1);
+        public static readonly Vector3 One = new Vector3(1);
+
+        public override string ToString() {
+            return $"({X}, {Y}, {Z})";
+        }
 
     }
 }

@@ -22,3 +22,8 @@ msbuild UnityStudioLib.sln /p:Configuration=Release
 This repository: MIT
 
 For the license of tracking repository, see [here](tracking/UnityStudio/License.md).
+
+This project also utilizes:
+
+- `SevenZipHelper` by [Peter Bromberg](http://www.nullskull.com/a/768/7zip-lzma-inmemory-compression-with-c.aspx)
+- `System.Half` by [landislavlang](https://sourceforge.net/projects/csharp-half/) (in Public Domain)

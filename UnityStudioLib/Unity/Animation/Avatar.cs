@@ -68,7 +68,7 @@ namespace UnityStudio.Unity.Animation {
         [NotNull]
         internal static Avatar ReadFromAssetPreloadData([NotNull] AssetPreloadData preloadData) {
             var sourceFile = preloadData.Source;
-            var version = sourceFile.Version;
+            var version = sourceFile.VersionComponents;
             var reader = sourceFile.FileReader;
             var avatar = new Avatar();
 

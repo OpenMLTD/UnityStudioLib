@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using UnityStudio.Unity;
+using UnityStudio.Unity.MeshParts;
 
 namespace UnityStudio.Extensions {
     internal static class BinaryReaderExtensions {
@@ -66,6 +67,73 @@ namespace UnityStudio.Extensions {
 
             return quaternion;
         }
+
+        [NotNull]
+        internal static BlendShapeData ReadBlendShapeData([NotNull] this BinaryReader reader) {
+            var vertexCount = reader.ReadInt32();
+            var vertices = new BlendShapeVertex[vertexCount];
+
+            for (var i = 0; i < vertexCount; ++i) {
+                vertices[i] = ReadBlendShapeVertex(reader);
+            }
+
+            var shapeCount = reader.ReadInt32();
+            var shapes = new MeshBlendShape[shapeCount];
+
+            for (var i = 0; i < shapeCount; ++i) {
+                shapes[i] = ReadMeshBlendShape(reader);
+            }
+
+            var channelCount = reader.ReadInt32();
+            var channels = new MeshBlendShapeChannel[channelCount];
+
+            for (var i = 0; i < channelCount; ++i) {
+                channels[i] = ReadMeshBlendShapeChannel(reader);
+            }
+
+            var weightCount = reader.ReadInt32();
+            var weights = new float[weightCount];
+
+            for (var i = 0; i < weightCount; ++i) {
+                weights[i] = reader.ReadSingle();
+            }
+
+            return new BlendShapeData(vertices, shapes, channels, weights);
+
+            BlendShapeVertex ReadBlendShapeVertex(BinaryReader r) {
+                var vertex = new BlendShapeVertex();
+
+                vertex.Vertex = r.ReadVector3();
+                vertex.Normal = r.ReadVector3();
+                vertex.Tangent = r.ReadVector3();
+                vertex.Index = r.ReadUInt32();
+
+                return vertex;
+            }
+
+            MeshBlendShape ReadMeshBlendShape(BinaryReader r) {
+                var shape = new MeshBlendShape();
+
+                shape.FirstVertex = r.ReadUInt32();
+                shape.VertexCount = r.ReadUInt32();
+                shape.HasNormals = r.ReadBoolean();
+                shape.HasTangents = r.ReadBoolean();
+
+                return shape;
+            }
+
+            MeshBlendShapeChannel ReadMeshBlendShapeChannel(BinaryReader r) {
+                var channel = new MeshBlendShapeChannel();
+
+                channel.Name = r.ReadAlignedString();
+                channel.NameHash = r.ReadUInt32();
+                channel.FrameIndex = r.ReadInt32();
+                channel.FrameCount = r.ReadInt32();
+
+                return channel;
+            }
+        }
+
 
     }
 }

@@ -13,5 +13,9 @@ namespace UnityStudio.Unity {
             W = 1.0f
         };
 
+        public override string ToString() {
+            return $"Axis: ({X}, {Y}, {Z}), Angle: {W}";
+        }
+
     }
 }

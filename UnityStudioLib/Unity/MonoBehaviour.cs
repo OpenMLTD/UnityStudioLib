@@ -24,6 +24,7 @@ namespace UnityStudio.Unity {
             Name = string.IsNullOrEmpty(name) ? $"{preloadData.TypeName} #{preloadData.UniqueID}" : name;
 
             MetadataOnly = metadataOnly;
+
             if (metadataOnly) {
                 return;
             }
