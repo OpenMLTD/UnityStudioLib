@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityStudio.Unity;
 
 namespace UnityStudio.Extensions {
-    public static class BinaryReaderExtensions {
+    internal static class BinaryReaderExtensions {
 
         public static void AlignBy([NotNull] this BinaryReader reader, int alignment) {
             var position = reader.BaseStream.Position;
