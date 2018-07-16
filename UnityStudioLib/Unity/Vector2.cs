@@ -1,4 +1,7 @@
+using System.Runtime.InteropServices;
+
 namespace UnityStudio.Unity {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Vector2 {
 
         public Vector2(float x, float y) {

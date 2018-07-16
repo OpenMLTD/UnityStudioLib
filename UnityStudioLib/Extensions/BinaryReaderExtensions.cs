@@ -36,7 +36,16 @@ namespace UnityStudio.Extensions {
             return result;
         }
 
-        public static Vector3 ReadVector3([NotNull] this BinaryReader reader) {
+        internal static Vector2 ReadVector2([NotNull] this BinaryReader reader) {
+            var vector = new Vector2();
+
+            vector.X = reader.ReadSingle();
+            vector.Y = reader.ReadSingle();
+
+            return vector;
+        }
+
+        internal static Vector3 ReadVector3([NotNull] this BinaryReader reader) {
             var vector = new Vector3();
 
             vector.X = reader.ReadSingle();
@@ -46,7 +55,7 @@ namespace UnityStudio.Extensions {
             return vector;
         }
 
-        public static Vector4 ReadVector4([NotNull] this BinaryReader reader) {
+        internal static Vector4 ReadVector4([NotNull] this BinaryReader reader) {
             var vector = new Vector4();
 
             vector.X = reader.ReadSingle();
@@ -57,7 +66,7 @@ namespace UnityStudio.Extensions {
             return vector;
         }
 
-        public static Quaternion ReadQuaternion([NotNull] this BinaryReader reader) {
+        internal static Quaternion ReadQuaternion([NotNull] this BinaryReader reader) {
             var quaternion = new Quaternion();
 
             quaternion.X = reader.ReadSingle();

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
@@ -181,13 +182,12 @@ namespace UnityStudio.Unity {
             }
             #endregion
 
-            #region Vertex Buffer for 3.4.2 and earlier
-            if (version[0] < 3 || (version[0] == 3 && version[1] < 5)) {
+            if (version[0] < 3 || (version[0] == 3 && version[1] < 5)) { // Vertex Buffer for 3.4.2 and earlier
                 var vertexCount = reader.ReadInt32();
-                var vertices = new float[vertexCount * 3];
+                var vertices = new Vector3[vertexCount];
 
-                for (var v = 0; v < vertexCount * 3; v++) {
-                    vertices[v] = reader.ReadSingle();
+                for (var v = 0; v < vertexCount; v++) {
+                    vertices[v] = reader.ReadVector3();
                 }
 
                 Vertices = vertices;
@@ -227,44 +227,40 @@ namespace UnityStudio.Unity {
                 BindPose = bindPose;
 
                 var uv1Count = reader.ReadInt32();
-                UV1 = new float[uv1Count * 2];
+                UV1 = new Vector2[uv1Count];
 
-                for (var v = 0; v < uv1Count * 2; v++) {
-                    UV1[v] = reader.ReadSingle();
+                for (var v = 0; v < uv1Count; v++) {
+                    UV1[v] = reader.ReadVector2();
                 }
 
                 var uv2Count = reader.ReadInt32();
-                UV2 = new float[uv2Count * 2];
+                UV2 = new Vector2[uv2Count];
 
                 for (var v = 0; v < uv2Count * 2; v++) {
-                    UV2[v] = reader.ReadSingle();
+                    UV2[v] = reader.ReadVector2();
                 }
 
                 if (version[0] == 2 && version[1] <= 5) {
-                    var m_TangentSpace_size = reader.ReadInt32();
-                    Normals = new float[m_TangentSpace_size * 3];
+                    var tangentSpaceSize = reader.ReadInt32();
 
-                    for (var v = 0; v < m_TangentSpace_size; v++) {
-                        Normals[v * 3] = reader.ReadSingle();
-                        Normals[v * 3 + 1] = reader.ReadSingle();
-                        Normals[v * 3 + 2] = reader.ReadSingle();
+                    Normals = new Vector3[tangentSpaceSize];
+
+                    for (var v = 0; v < tangentSpaceSize; v++) {
+                        Normals[v] = reader.ReadVector3();
                         reader.Position += 16; //Vector3f tangent & float handedness 
                     }
                 } else { //2.6.0 and later
-                    var m_Tangents_size = reader.ReadInt32();
-                    reader.Position += m_Tangents_size * 16; //Vector4f
+                    var tangentCount = reader.ReadInt32();
+                    reader.Position += tangentCount * 16; //Vector4f
 
-                    var m_Normals_size = reader.ReadInt32();
-                    Normals = new float[m_Normals_size * 3];
+                    var normalCount = reader.ReadInt32();
+                    Normals = new Vector3[normalCount];
 
-                    for (var v = 0; v < m_Normals_size * 3; v++) {
-                        Normals[v] = reader.ReadSingle();
+                    for (var v = 0; v < normalCount; v++) {
+                        Normals[v] = reader.ReadVector3();
                     }
                 }
-            }
-            #endregion
-            #region Vertex Buffer for 3.5.0 and later
-                else {
+            } else { // Vertex Buffer for 3.5.0 and later
                 #region read vertex stream
 
                 if (version[0] < 2018 || (version[0] == 2018 && version[1] < 2)) {  //2018.2 down
@@ -402,7 +398,7 @@ namespace UnityStudio.Unity {
                                     channelMask |= 1u << j;
                                 }
 
-                                streamInfo.Stride += channel.Dimension * (4 / (int)Math.Pow(2, channel.Format));
+                                streamInfo.Stride += channel.Dimension * (4 / (1 << channel.Format));
                             }
                         }
 
@@ -450,7 +446,7 @@ namespace UnityStudio.Unity {
                                 channel.Dimension = 4;
                             }
 
-                            componentByteSize = 4 / (int)Math.Pow(2, channel.Format);
+                            componentByteSize = 4 / (1 << channel.Format);
 
                             componentBytes = new byte[componentByteSize];
                             componentsArray = new float[VertexCount * channel.Dimension];
@@ -468,30 +464,52 @@ namespace UnityStudio.Unity {
                             }
 
                             switch (b) {
-                                case 0:
-                                    Vertices = componentsArray;
-                                    break;
-                                case 1:
-                                    Normals = componentsArray;
-                                    break;
-                                case 2:
-                                    Colors = componentsArray;
-                                    break;
-                                case 3:
-                                    UV1 = componentsArray;
-                                    break;
-                                case 4:
-                                    UV2 = componentsArray;
-                                    break;
-                                case 5:
-                                    if (version[0] >= 5) {
-                                        UV3 = componentsArray;
-                                    } else {
-                                        Tangents = componentsArray;
+                                case 0: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Vertices = arr;
+                                        break;
                                     }
-                                    break;
-                                case 6: UV4 = componentsArray; break;
-                                case 7: Tangents = componentsArray; break;
+                                case 1: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Normals = arr;
+                                        break;
+                                    }
+                                case 2: {
+                                        FloatVectorCopy4(componentsArray, out var arr);
+                                        Colors = arr;
+                                        break;
+                                    }
+                                case 3: {
+                                        FloatVectorCopy2(componentsArray, out var arr);
+                                        UV1 = arr;
+                                        break;
+                                    }
+                                case 4: {
+                                        FloatVectorCopy2(componentsArray, out var arr);
+                                        UV2 = arr;
+                                        break;
+                                    }
+                                case 5: {
+                                        if (version[0] >= 5) {
+                                            FloatVectorCopy2(componentsArray, out var arr);
+                                            UV3 = arr;
+                                        } else {
+                                            FloatVectorCopy3(componentsArray, out var arr);
+                                            Tangents = arr;
+                                        }
+
+                                        break;
+                                    }
+                                case 6: {
+                                        FloatVectorCopy2(componentsArray, out var arr);
+                                        UV4 = arr;
+                                        break;
+                                    }
+                                case 7: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Tangents = arr;
+                                        break;
+                                    }
                             }
 
                             stream.ChannelMask.Set(b, false);
@@ -550,24 +568,36 @@ namespace UnityStudio.Unity {
                             }
 
                             switch (b) {
-                                case 0:
-                                    Vertices = componentsArray;
-                                    break;
-                                case 1:
-                                    Normals = componentsArray;
-                                    break;
-                                case 2:
-                                    Colors = componentsArray;
-                                    break;
-                                case 3:
-                                    UV1 = componentsArray;
-                                    break;
-                                case 4:
-                                    UV2 = componentsArray;
-                                    break;
-                                case 5:
-                                    Tangents = componentsArray;
-                                    break;
+                                case 0: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Vertices = arr;
+                                        break;
+                                    }
+                                case 1: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Normals = arr;
+                                        break;
+                                    }
+                                case 2: {
+                                        FloatVectorCopy4(componentsArray, out var arr);
+                                        Colors = arr;
+                                        break;
+                                    }
+                                case 3: {
+                                        FloatVectorCopy2(componentsArray, out var arr);
+                                        UV1 = arr;
+                                        break;
+                                    }
+                                case 4: {
+                                        FloatVectorCopy2(componentsArray, out var arr);
+                                        UV2 = arr;
+                                        break;
+                                    }
+                                case 5: {
+                                        FloatVectorCopy3(componentsArray, out var arr);
+                                        Tangents = arr;
+                                        break;
+                                    }
                             }
 
                             channel.Offset += (byte)(channel.Dimension * componentByteSize); //safe to cast as byte because strides larger than 255 are unlikely
@@ -577,7 +607,6 @@ namespace UnityStudio.Unity {
                 }
                 #endregion
             }
-            #endregion
 
             #region Compressed Mesh data for 2.6.0 and later - 160 bytes
             if (version[0] >= 3 || (version[0] == 2 && version[1] >= 6)) {
@@ -595,10 +624,14 @@ namespace UnityStudio.Unity {
                         bitmax |= (1 << b);
                     }
 
-                    Vertices = new float[verticesPacked.ItemCount];
+                    Vertices = new Vector3[verticesPacked.ItemCount / 3];
 
-                    for (var v = 0; v < verticesPacked.ItemCount; v++) {
-                        Vertices[v] = ((float)verticesUnpacked[v] / bitmax) * verticesPacked.Range + verticesPacked.Start;
+                    for (var v = 0; v < Vertices.Length; ++v) {
+                        var x = ((float)verticesUnpacked[v * 3] / bitmax) * verticesPacked.Range + verticesPacked.Start;
+                        var y = ((float)verticesUnpacked[v * 3 + 1] / bitmax) * verticesPacked.Range + verticesPacked.Start;
+                        var z = ((float)verticesUnpacked[v * 3 + 2] / bitmax) * verticesPacked.Range + verticesPacked.Start;
+
+                        Vertices[v] = new Vector3(x, y, z);
                     }
                 }
                 #endregion
@@ -614,31 +647,49 @@ namespace UnityStudio.Unity {
                         bitmax |= (1 << b);
                     }
 
-                    UV1 = new float[VertexCount * 2];
+                    UV1 = new Vector2[VertexCount];
 
-                    for (var v = 0; v < VertexCount * 2; v++) {
-                        UV1[v] = ((float)uvUnpacked[v] / bitmax) * uvPacked.Range + uvPacked.Start;
+                    for (var v = 0; v < UV1.Length; ++v) {
+                        var x = ((float)uvUnpacked[v * 2] / bitmax) * uvPacked.Range + uvPacked.Start;
+                        var y = ((float)uvUnpacked[v * 2 + 1] / bitmax) * uvPacked.Range + uvPacked.Start;
+
+                        UV1[v] = new Vector2(x, y);
                     }
 
                     if (uvPacked.ItemCount >= VertexCount * 4) {
-                        UV2 = new float[VertexCount * 2];
+                        UV2 = new Vector2[VertexCount];
 
-                        for (uint v = 0; v < VertexCount * 2; v++) {
-                            UV2[v] = ((float)uvUnpacked[v + VertexCount * 2] / bitmax) * uvPacked.Range + uvPacked.Start;
+                        var baseUV2 = VertexCount * 2;
+
+                        for (uint v = 0; v < UV2.Length; ++v) {
+                            var x = ((float)uvUnpacked[v * 2 + baseUV2] / bitmax) * uvPacked.Range + uvPacked.Start;
+                            var y = ((float)uvUnpacked[v * 2 + baseUV2 + 1] / bitmax) * uvPacked.Range + uvPacked.Start;
+
+                            UV2[v] = new Vector2(x, y);
                         }
 
                         if (uvPacked.ItemCount >= VertexCount * 6) {
-                            UV3 = new float[VertexCount * 2];
+                            UV3 = new Vector2[VertexCount];
 
-                            for (uint v = 0; v < VertexCount * 2; v++) {
-                                UV3[v] = ((float)uvUnpacked[v + VertexCount * 4] / bitmax) * uvPacked.Range + uvPacked.Start;
+                            var baseUV4 = VertexCount * 4;
+
+                            for (uint v = 0; v < UV3.Length; ++v) {
+                                var x = ((float)uvUnpacked[v * 2 + baseUV4] / bitmax) * uvPacked.Range + uvPacked.Start;
+                                var y = ((float)uvUnpacked[v * 2 + baseUV4 + 1] / bitmax) * uvPacked.Range + uvPacked.Start;
+
+                                UV3[v] = new Vector2(x, y);
                             }
 
                             if (uvPacked.ItemCount == VertexCount * 8) {
-                                UV4 = new float[VertexCount * 2];
+                                UV4 = new Vector2[VertexCount];
 
-                                for (uint v = 0; v < VertexCount * 2; v++) {
-                                    UV4[v] = ((float)uvUnpacked[v + VertexCount * 6] / bitmax) * uvPacked.Range + uvPacked.Start;
+                                var baseUV6 = VertexCount * 6;
+
+                                for (uint v = 0; v < UV4.Length; ++v) {
+                                    var x = ((float)uvUnpacked[v * 2 + baseUV6] / bitmax) * uvPacked.Range + uvPacked.Start;
+                                    var y = ((float)uvUnpacked[v * 2 + baseUV6 + 1] / bitmax) * uvPacked.Range + uvPacked.Start;
+
+                                    UV4[v] = new Vector2(x, y);
                                 }
                             }
                         }
@@ -691,16 +742,18 @@ namespace UnityStudio.Unity {
 
                     }
 
-                    Normals = new float[normalsPacked.ItemCount / 2 * 3];
+                    Normals = new Vector3[normalsPacked.ItemCount / 2];
 
-                    for (var v = 0; v < normalsPacked.ItemCount / 2; v++) {
-                        Normals[v * 3] = ((float)normalsUnpacked[v * 2] / bitmax) * normalsPacked.Range + normalsPacked.Start;
-                        Normals[v * 3 + 1] = ((float)normalsUnpacked[v * 2 + 1] / bitmax) * normalsPacked.Range + normalsPacked.Start;
-                        Normals[v * 3 + 2] = (float)Math.Sqrt(1 - Normals[v * 3] * Normals[v * 3] - Normals[v * 3 + 1] * Normals[v * 3 + 1]);
+                    for (var v = 0; v < Normals.Length; ++v) {
+                        var x = ((float)normalsUnpacked[v * 2] / bitmax) * normalsPacked.Range + normalsPacked.Start;
+                        var y = ((float)normalsUnpacked[v * 2 + 1] / bitmax) * normalsPacked.Range + normalsPacked.Start;
+                        var z = (float)Math.Sqrt(1 - x * x - y * y);
 
                         if (normalSigns[v] == 0) {
-                            Normals[v * 3 + 2] *= -1;
+                            z = -z;
                         }
+
+                        Normals[v] = new Vector3(x, y, z);
                     }
                 }
                 #endregion
@@ -717,16 +770,18 @@ namespace UnityStudio.Unity {
                         bitmax |= (1 << b);
                     }
 
-                    Tangents = new float[tangentsPacked.ItemCount / 2 * 3];
+                    Tangents = new Vector3[tangentsPacked.ItemCount / 2];
 
-                    for (var v = 0; v < tangentsPacked.ItemCount / 2; v++) {
-                        Tangents[v * 3] = ((float)tangentsUnpacked[v * 2] / bitmax) * tangentsPacked.Range + tangentsPacked.Start;
-                        Tangents[v * 3 + 1] = ((float)tangentsUnpacked[v * 2 + 1] / bitmax) * tangentsPacked.Range + tangentsPacked.Start;
-                        Tangents[v * 3 + 2] = (float)Math.Sqrt(1 - Tangents[v * 3] * Tangents[v * 3] - Tangents[v * 3 + 1] * Tangents[v * 3 + 1]);
+                    for (var v = 0; v < Tangents.Length; ++v) {
+                        var x = ((float)tangentsUnpacked[v * 2] / bitmax) * tangentsPacked.Range + tangentsPacked.Start;
+                        var y = ((float)tangentsUnpacked[v * 2 + 1] / bitmax) * tangentsPacked.Range + tangentsPacked.Start;
+                        var z = (float)Math.Sqrt(1 - x * x - y * y);
 
                         if (tangentSignsUnpacked[v] == 0) {
-                            Tangents[v * 3 + 2] *= -1;
+                            z = -z;
                         }
+
+                        Tangents[v] = new Vector3(x, y, z);
                     }
                 }
                 #endregion
@@ -743,10 +798,15 @@ namespace UnityStudio.Unity {
                             bitmax |= (1 << b);
                         }
 
-                        Colors = new float[floatColors.ItemCount];
+                        Colors = new Vector4[floatColors.ItemCount / 4];
 
-                        for (var v = 0; v < floatColors.ItemCount; v++) {
-                            Colors[v] = (float)floatColorsUnpacked[v] / bitmax * floatColors.Range + floatColors.Start;
+                        for (var v = 0; v < Colors.Length; ++v) {
+                            var x = (float)floatColorsUnpacked[v * 4] / bitmax * floatColors.Range + floatColors.Start;
+                            var y = (float)floatColorsUnpacked[v * 4 + 1] / bitmax * floatColors.Range + floatColors.Start;
+                            var z = (float)floatColorsUnpacked[v * 4 + 2] / bitmax * floatColors.Range + floatColors.Start;
+                            var w = (float)floatColorsUnpacked[v * 4 + 3] / bitmax * floatColors.Range + floatColors.Start;
+
+                            Colors[v] = new Vector4(x, y, z, w);
                         }
                     }
                 }
@@ -813,12 +873,14 @@ namespace UnityStudio.Unity {
                             if (inflSum == 31) {
                                 break;
                             }
+
                             if (inflSum > 31) {
                                 throw new Exception("Influence sum " + inflSum + " greater than 31");
                             }
                         }
+
                         for (; j < 4; j++) {
-                            var boneInfl = new BoneInfluence() {
+                            var boneInfl = new BoneInfluence {
                                 Weight = 0.0f,
                                 BoneIndex = 0,
                             };
@@ -847,10 +909,15 @@ namespace UnityStudio.Unity {
                 reader.Position += 24; //Axis-Aligned Bounding Box
                 var colorCount = reader.ReadInt32();
 
-                Colors = new float[colorCount * 4];
+                Colors = new Vector4[colorCount];
 
-                for (var v = 0; v < colorCount * 4; v++) {
-                    Colors[v] = (float)(reader.ReadByte()) / 0xff;
+                for (var v = 0; v < colorCount; ++v) {
+                    var x = (float)(reader.ReadByte()) / 0xff;
+                    var y = (float)(reader.ReadByte()) / 0xff;
+                    var z = (float)(reader.ReadByte()) / 0xff;
+                    var w = (float)(reader.ReadByte()) / 0xff;
+
+                    Colors[v] = new Vector4(x, y, z, w);
                 }
 
                 var collisionTrianglesCount = reader.ReadInt32();
@@ -868,10 +935,15 @@ namespace UnityStudio.Unity {
                     if (colorsPacked.ItemCount > 0) {
                         if (colorsPacked.BitSize == 32) {
                             //4 x 8bit color channels
-                            Colors = new float[colorsPacked.Data.Length];
+                            Colors = new Vector4[colorsPacked.Data.Length / 4];
 
-                            for (var v = 0; v < colorsPacked.Data.Length; v++) {
-                                Colors[v] = (float)colorsPacked.Data[v] / 0xFF;
+                            for (var v = 0; v < Colors.Length; ++v) {
+                                var x = (float)colorsPacked.Data[v * 4] / 0xff;
+                                var y = (float)colorsPacked.Data[v * 4 + 1] / 0xff;
+                                var z = (float)colorsPacked.Data[v * 4 + 2] / 0xff;
+                                var w = (float)colorsPacked.Data[v * 4 + 3] / 0xff;
+
+                                Colors[v] = new Vector4(x, y, z, w);
                             }
                         } else //not tested
                           {
@@ -882,10 +954,15 @@ namespace UnityStudio.Unity {
                                 bitmax |= (1 << b);
                             }
 
-                            Colors = new float[colorsPacked.ItemCount];
+                            Colors = new Vector4[colorsPacked.ItemCount / 4];
 
-                            for (var v = 0; v < colorsPacked.ItemCount; v++) {
-                                Colors[v] = (float)colorsUnpacked[v] / bitmax;
+                            for (var v = 0; v < Colors.Length; ++v) {
+                                var x = (float)colorsUnpacked[v * 4] / bitmax;
+                                var y = (float)colorsUnpacked[v * 4 + 1] / bitmax;
+                                var z = (float)colorsUnpacked[v * 4 + 2] / bitmax;
+                                var w = (float)colorsUnpacked[v * 4 + 3] / bitmax;
+
+                                Colors[v] = new Vector4(x, y, z, w);
                             }
                         }
                     }
@@ -913,12 +990,14 @@ namespace UnityStudio.Unity {
                     firstIndex /= 2;
                 }
 
+                subMeshes[s].FirstIndex = firstIndex;
+
                 if (SubMeshes[s].Topology == 0) {
                     for (var i = 0; i < SubMeshes[s].IndexCount / 3; i++) {
-                        m_Indices.Add(_indexBuffer[firstIndex + i * 3]);
-                        m_Indices.Add(_indexBuffer[firstIndex + i * 3 + 1]);
-                        m_Indices.Add(_indexBuffer[firstIndex + i * 3 + 2]);
-                        m_materialIDs.Add(s);
+                        _indices.Add(_indexBuffer[firstIndex + i * 3]);
+                        _indices.Add(_indexBuffer[firstIndex + i * 3 + 1]);
+                        _indices.Add(_indexBuffer[firstIndex + i * 3 + 2]);
+                        _materialIDs.Add(s);
                     }
                 } else {
                     uint j = 0;
@@ -928,18 +1007,22 @@ namespace UnityStudio.Unity {
                         var fc = _indexBuffer[firstIndex + i + 2];
 
                         if ((fa != fb) && (fa != fc) && (fc != fb)) {
-                            m_Indices.Add(fa);
+                            _indices.Add(fa);
+
                             if ((i % 2) == 0) {
-                                m_Indices.Add(fb);
-                                m_Indices.Add(fc);
+                                _indices.Add(fb);
+                                _indices.Add(fc);
                             } else {
-                                m_Indices.Add(fc);
-                                m_Indices.Add(fb);
+                                _indices.Add(fc);
+                                _indices.Add(fb);
                             }
-                            m_materialIDs.Add(s);
+
+                            _materialIDs.Add(s);
+
                             j++;
                         }
                     }
+
                     //just fix it
                     SubMeshes[s].IndexCount = j * 3;
                 }
@@ -961,6 +1044,57 @@ namespace UnityStudio.Unity {
 
                 return packedBitVector;
             }
+
+            unsafe void FloatVectorCopy2(float[] srcArr, out Vector2[] destArr) {
+                const int numFloatInT = 2;
+                destArr = new Vector2[srcArr.Length / numFloatInT];
+
+                fixed (void* p = destArr) {
+                    Marshal.Copy(srcArr, 0, new IntPtr(p), srcArr.Length);
+                }
+
+                //for (var i = 0; i < destArr.Length; ++i) {
+                //    var x = srcArr[i * numFloatInT];
+                //    var y = srcArr[i * numFloatInT + 1];
+
+                //    destArr[i] = new Vector2(x, y);
+                //}
+            }
+
+            unsafe void FloatVectorCopy3(float[] srcArr, out Vector3[] destArr) {
+                const int numFloatInT = 3;
+                destArr = new Vector3[srcArr.Length / numFloatInT];
+
+                fixed (void* p = destArr) {
+                    Marshal.Copy(srcArr, 0, new IntPtr(p), srcArr.Length);
+                }
+
+                //for (var i = 0; i < destArr.Length; ++i) {
+                //    var x = srcArr[i * numFloatInT];
+                //    var y = srcArr[i * numFloatInT + 1];
+                //    var z = srcArr[i * numFloatInT + 2];
+
+                //    destArr[i] = new Vector3(x, y, z);
+                //}
+            }
+
+            unsafe void FloatVectorCopy4(float[] srcArr, out Vector4[] destArr) {
+                const int numFloatInT = 4;
+                destArr = new Vector4[srcArr.Length / numFloatInT];
+
+                fixed (void* p = destArr) {
+                    Marshal.Copy(srcArr, 0, new IntPtr(p), srcArr.Length);
+                }
+
+                //for (var i = 0; i < destArr.Length; ++i) {
+                //    var x = srcArr[i * numFloatInT];
+                //    var y = srcArr[i * numFloatInT + 1];
+                //    var z = srcArr[i * numFloatInT + 2];
+                //    var w = srcArr[i * numFloatInT + 3];
+
+                //    destArr[i] = new Vector4(x, y, z, w);
+                //}
+            }
         }
 
         [NotNull]
@@ -968,10 +1102,11 @@ namespace UnityStudio.Unity {
 
         public IReadOnlyList<SubMesh> SubMeshes { get; }
 
-        public List<uint> m_Indices = new List<uint>(); //use a list because I don't always know the facecount for triangle strips
+        public IReadOnlyList<uint> Indices => _indices; //use a list because I don't always know the facecount for triangle strips
 
-        public List<int> m_materialIDs = new List<int>();
+        public IReadOnlyList<int> MaterialIDs => _materialIDs;
 
+        [NotNull, ItemNotNull]
         public IReadOnlyList<IReadOnlyList<BoneInfluence>> Skin { get; }
 
         [NotNull, ItemNotNull]
@@ -980,28 +1115,28 @@ namespace UnityStudio.Unity {
         public int VertexCount { get; }
 
         [NotNull]
-        public float[] Vertices { get; }
+        public Vector3[] Vertices { get; }
 
         [NotNull]
-        public float[] Normals { get; }
+        public Vector3[] Normals { get; }
 
         [CanBeNull]
-        public float[] Colors { get; }
+        public Vector4[] Colors { get; }
 
         [NotNull]
-        public float[] UV1 { get; }
+        public Vector2[] UV1 { get; }
 
         [NotNull]
-        public float[] UV2 { get; }
+        public Vector2[] UV2 { get; }
 
         [CanBeNull]
-        public float[] UV3 { get; }
+        public Vector2[] UV3 { get; }
 
         [CanBeNull]
-        public float[] UV4 { get; }
+        public Vector2[] UV4 { get; }
 
         [CanBeNull]
-        public float[] Tangents { get; }
+        public Vector3[] Tangents { get; }
 
         [NotNull]
         public uint[] BoneNameHashes { get; }
@@ -1071,7 +1206,7 @@ namespace UnityStudio.Unity {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float BytesToFloat([NotNull] byte[] data, Endian endian) {
-            if (endian == SystemEndian.Type) {
+            if (endian != SystemEndian.Type) {
                 Array.Reverse(data);
             }
 
@@ -1105,6 +1240,10 @@ namespace UnityStudio.Unity {
         private static readonly bool ExportColors = true;
 
         private readonly EndianBinaryReader _reader;
+
+        private readonly List<uint> _indices = new List<uint>();
+
+        private readonly List<int> _materialIDs = new List<int>();
 
         [NotNull]
         private readonly uint[] _indexBuffer;
