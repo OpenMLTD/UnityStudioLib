@@ -98,6 +98,7 @@
     <Compile Include="Unity\Animation\Skeleton.cs" />
     <Compile Include="Unity\Animation\SkeletonNode.cs" />
     <Compile Include="Unity\Animation\SkeletonPose.cs" />
+    <Compile Include="Unity\Matrix4x4.cs" />
     <Compile Include="Unity\Mesh.cs" />
     <Compile Include="Unity\MeshParts\AABB.cs" />
     <Compile Include="Unity\MeshParts\BlendShapeData.cs" />

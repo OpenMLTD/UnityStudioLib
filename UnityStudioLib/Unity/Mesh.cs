@@ -122,14 +122,15 @@ namespace UnityStudio.Unity {
                 Shape = reader.ReadBlendShapeData();
 
                 var bindPoseCount = reader.ReadInt32();
-                var bindPose = new float[bindPoseCount][,];
+                var bindPose = new Matrix4x4[bindPoseCount];
 
                 for (var i = 0; i < bindPoseCount; i++) {
-                    bindPose[i] = new[,] {
-                        { reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle() },
-                        { reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle() },
-                        { reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle() },
-                        { reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle() } };
+                    bindPose[i] = Matrix4x4.FromArray(new[,] {
+                        {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
+                        {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
+                        {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
+                        {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()}
+                    });
                 }
 
                 BindPose = bindPose;
@@ -213,15 +214,15 @@ namespace UnityStudio.Unity {
                 Skin = skin;
 
                 var bindPoseCount = reader.ReadInt32();
-                var bindPose = new float[bindPoseCount][,];
+                var bindPose = new Matrix4x4[bindPoseCount];
 
                 for (var i = 0; i < bindPoseCount; i++) {
-                    bindPose[i] = new[,] {
+                    bindPose[i] = Matrix4x4.FromArray(new[,] {
                         {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                         {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                         {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                         {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()}
-                    };
+                    });
                 }
 
                 BindPose = bindPose;
@@ -287,15 +288,15 @@ namespace UnityStudio.Unity {
 
                 if (version[0] == 3 || (version[0] == 4 && version[1] <= 2)) {
                     var bindPoseCount = reader.ReadInt32();
-                    var bindPose = new float[bindPoseCount][,];
+                    var bindPose = new Matrix4x4[bindPoseCount];
 
                     for (var i = 0; i < bindPoseCount; i++) {
-                        bindPose[i] = new[,] {
+                        bindPose[i] = Matrix4x4.FromArray(new[,] {
                             {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                             {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                             {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()},
                             {reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()}
-                        };
+                        });
                     }
 
                     BindPose = bindPose;
@@ -427,8 +428,8 @@ namespace UnityStudio.Unity {
                 float[] componentsArray;
 
                 if (_channels != null) { // 4.0.0 and later
-                    //it is better to loop channels instead of streams
-                    //because channels are likely to be sorted by vertex property
+                                         //it is better to loop channels instead of streams
+                                         //because channels are likely to be sorted by vertex property
                     foreach (var channel in _channels) {
                         if (channel.Dimension <= 0) {
                             continue;
@@ -709,15 +710,18 @@ namespace UnityStudio.Unity {
                             bitmax |= (1 << b);
                         }
 
-                        BindPose = new float[bindPosesPacked.ItemCount / 16][,];
+                        BindPose = new Matrix4x4[bindPosesPacked.ItemCount / 16];
 
                         for (var i = 0; i < BindPose.Length; i++) {
-                            BindPose[i] = new float[4, 4];
+                            var pose = new Matrix4x4();
+
                             for (var j = 0; j < 4; j++) {
                                 for (var k = 0; k < 4; k++) {
-                                    BindPose[i][j, k] = (float)((double)bindPosesUnpacked[i * 16 + j * 4 + k] / bitmax) * bindPosesPacked.Range + bindPosesPacked.Start;
+                                    pose[j, k] = (float)((double)bindPosesUnpacked[i * 16 + j * 4 + k] / bitmax) * bindPosesPacked.Range + bindPosesPacked.Start;
                                 }
                             }
+
+                            BindPose[i] = pose;
                         }
                     }
                 }
@@ -1109,8 +1113,8 @@ namespace UnityStudio.Unity {
         [NotNull, ItemNotNull]
         public IReadOnlyList<IReadOnlyList<BoneInfluence>> Skin { get; }
 
-        [NotNull, ItemNotNull]
-        public float[][,] BindPose { get; }
+        [NotNull]
+        public Matrix4x4[] BindPose { get; }
 
         public int VertexCount { get; }
 

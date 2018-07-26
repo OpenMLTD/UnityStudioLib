@@ -1,14 +1,14 @@
 namespace UnityStudio.Unity.Animation {
     public sealed class SkeletonNode {
 
-        internal SkeletonNode(int parentId, int axesId) {
-            ParentId = parentId;
-            AxesId = axesId;
+        internal SkeletonNode(int parentIndex, int axisIndex) {
+            ParentIndex = parentIndex;
+            AxisIndex = axisIndex;
         }
 
-        public int ParentId { get; }
+        public int ParentIndex { get; }
 
-        public int AxesId { get; }
+        public int AxisIndex { get; }
 
     }
 }
