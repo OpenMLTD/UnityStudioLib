@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Matrix4x4 {
 

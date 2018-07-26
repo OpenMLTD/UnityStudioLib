@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
-using UnityStudio.Unity;
-using UnityStudio.Unity.MeshParts;
+using UnityStudio.UnityEngine;
+using UnityStudio.UnityEngine.MeshParts;
 
 namespace UnityStudio.Extensions {
     internal static class BinaryReaderExtensions {

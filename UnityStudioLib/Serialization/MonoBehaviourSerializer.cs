@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
 using UnityStudio.Serialization.Naming;
-using UnityStudio.Unity;
+using UnityStudio.UnityEngine;
 
 namespace UnityStudio.Serialization {
     public sealed class MonoBehaviourSerializer {

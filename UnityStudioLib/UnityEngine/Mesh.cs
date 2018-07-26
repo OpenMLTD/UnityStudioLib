@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
-using UnityStudio.Unity.MeshParts;
+using UnityStudio.UnityEngine.MeshParts;
 
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     public sealed class Mesh {
 
         internal Mesh([NotNull] AssetPreloadData preloadData, bool metadataOnly) {

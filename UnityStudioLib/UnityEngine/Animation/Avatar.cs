@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
 
-namespace UnityStudio.Unity.Animation {
+namespace UnityStudio.UnityEngine.Animation {
     public sealed class Avatar {
 
         private Avatar() {

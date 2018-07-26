@@ -5,7 +5,7 @@ using SevenZip.Compression.LZMA;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
 
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     public sealed class TextAsset {
 
         internal TextAsset([NotNull] AssetPreloadData preloadData, bool metadataOnly) {

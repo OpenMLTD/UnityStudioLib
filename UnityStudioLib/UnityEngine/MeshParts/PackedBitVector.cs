@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace UnityStudio.Unity.MeshParts {
+namespace UnityStudio.UnityEngine.MeshParts {
     public sealed class PackedBitVector {
 
         internal PackedBitVector() {

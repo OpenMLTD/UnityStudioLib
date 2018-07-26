@@ -3,8 +3,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityStudio.Models;
-using UnityStudio.Unity;
-using UnityStudio.Unity.Animation;
+using UnityStudio.UnityEngine;
+using UnityStudio.UnityEngine.Animation;
 
 namespace UnityStudio.Extensions {
     public static class AssetPreloadDataExtensions {

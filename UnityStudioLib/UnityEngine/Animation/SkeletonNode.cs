@@ -1,4 +1,4 @@
-namespace UnityStudio.Unity.Animation {
+namespace UnityStudio.UnityEngine.Animation {
     public sealed class SkeletonNode {
 
         internal SkeletonNode(int parentIndex, int axisIndex) {

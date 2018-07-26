@@ -1,4 +1,4 @@
-namespace UnityStudio.Unity.MeshParts {
+namespace UnityStudio.UnityEngine.MeshParts {
     // ReSharper disable once InconsistentNaming
     public struct AABB {
 
