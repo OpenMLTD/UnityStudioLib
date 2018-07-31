@@ -128,6 +128,8 @@ namespace UnityStudio.Extensions {
                 shape.HasNormals = r.ReadBoolean();
                 shape.HasTangents = r.ReadBoolean();
 
+                r.AlignBy(4);
+
                 return shape;
             }
 
