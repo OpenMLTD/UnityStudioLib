@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -107,6 +109,7 @@
     <Compile Include="UnityEngine\MeshParts\ChannelInfo.cs" />
     <Compile Include="UnityEngine\MeshParts\MeshBlendShape.cs" />
     <Compile Include="UnityEngine\MeshParts\MeshBlendShapeChannel.cs" />
+    <Compile Include="UnityEngine\MeshParts\MeshTopology.cs" />
     <Compile Include="UnityEngine\MeshParts\PackedBitVector.cs" />
     <Compile Include="UnityEngine\MeshParts\StreamInfo.cs" />
     <Compile Include="UnityEngine\MeshParts\SubMesh.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="UnityEngine\Vector2.cs" />
     <Compile Include="UnityEngine\Vector3.cs" />
     <Compile Include="UnityEngine\Vector4.cs" />
+    <Compile Include="Utilities\CompositeMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
