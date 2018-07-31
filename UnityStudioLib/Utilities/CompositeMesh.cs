@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
 using UnityStudio.UnityEngine;
@@ -35,6 +36,12 @@ namespace UnityStudio.Utilities {
         }
 
         private string _name;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [NotNull]
+        public static CompositeMesh FromMeshes([NotNull, ItemNotNull] params Mesh[] meshes) {
+            return FromMeshes(meshes as IReadOnlyList<Mesh>);
+        }
 
         [NotNull]
         public static CompositeMesh FromMeshes([NotNull, ItemNotNull] IReadOnlyList<Mesh> meshes) {
