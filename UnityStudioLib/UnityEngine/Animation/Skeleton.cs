@@ -4,6 +4,7 @@ namespace UnityStudio.UnityEngine.Animation {
     public sealed class Skeleton {
 
         internal Skeleton() {
+            Axes = new object[0];
         }
 
         [NotNull, ItemNotNull]

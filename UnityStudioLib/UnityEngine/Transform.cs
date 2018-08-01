@@ -19,5 +19,9 @@ namespace UnityStudio.UnityEngine {
 
         public Vector3 Scale { get; set; }
 
+        public override string ToString() {
+            return $"T={Translation} Q={Rotation} S={Scale}";
+        }
+
     }
 }

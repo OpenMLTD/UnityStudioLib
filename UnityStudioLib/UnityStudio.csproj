@@ -61,6 +61,7 @@
     <Compile Include="Extensions\AssetPlatformExtensions.cs" />
     <Compile Include="Extensions\AssetPreloadDataExtensions.cs" />
     <Compile Include="Extensions\BinaryReaderExtensions.cs" />
+    <Compile Include="Utilities\EnumerableUtils.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="External\Half.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="UnityEngine\Vector2.cs" />
     <Compile Include="UnityEngine\Vector3.cs" />
     <Compile Include="UnityEngine\Vector4.cs" />
+    <Compile Include="Utilities\CompositeAvatar.cs" />
     <Compile Include="Utilities\CompositeMesh.cs" />
   </ItemGroup>
   <ItemGroup>

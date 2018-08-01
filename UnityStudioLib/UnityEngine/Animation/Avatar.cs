@@ -5,14 +5,13 @@ using UnityStudio.Extensions;
 using UnityStudio.Models;
 
 namespace UnityStudio.UnityEngine.Animation {
-    public sealed class Avatar {
+    public class Avatar {
 
-        private Avatar() {
+        private protected Avatar() {
             AvatarSkeleton = Skeleton.CreateEmpty();
             AvatarSkeletonPose = SkeletonPose.CreateEmpty();
             DefaultPose = SkeletonPose.CreateEmpty();
             SkeletonNameIDs = new uint[0];
-            Name = string.Empty;
             Human = new Human();
             HumanSkeletonIndices = new int[0];
             HumanSkeletonReverseIndices = new int[0];
@@ -23,7 +22,7 @@ namespace UnityStudio.UnityEngine.Animation {
         }
 
         [NotNull]
-        public string Name { get; internal set; }
+        public virtual string Name { get; protected set; } = string.Empty;
 
         public uint Size { get; internal set; }
 
@@ -40,27 +39,27 @@ namespace UnityStudio.UnityEngine.Animation {
         public uint[] SkeletonNameIDs { get; internal set; }
 
         [NotNull]
-        public Human Human { get; internal set; }
+        public Human Human { get; private set; }
 
         [NotNull]
-        public int[] HumanSkeletonIndices { get; internal set; }
+        public int[] HumanSkeletonIndices { get; private set; }
 
         [NotNull]
-        public int[] HumanSkeletonReverseIndices { get; internal set; }
+        public int[] HumanSkeletonReverseIndices { get; private set; }
 
-        public int RootMotionBoneIndex { get; internal set; } = -1;
-
-        [NotNull]
-        public Transform RootMotionBoneTransform { get; internal set; }
+        public int RootMotionBoneIndex { get; private set; } = -1;
 
         [NotNull]
-        public Skeleton RootMotionSkeleton { get; internal set; }
+        public Transform RootMotionBoneTransform { get; private set; }
 
         [NotNull]
-        public SkeletonPose RootMotionSkeletonPose { get; internal set; }
+        public Skeleton RootMotionSkeleton { get; private set; }
 
         [NotNull]
-        public int[] RootMotionSkeletonIndices { get; internal set; }
+        public SkeletonPose RootMotionSkeletonPose { get; private set; }
+
+        [NotNull]
+        public int[] RootMotionSkeletonIndices { get; private set; }
 
         [NotNull]
         public IReadOnlyDictionary<uint, string> BoneNamesMap => _boneNamesMap;
@@ -285,7 +284,7 @@ namespace UnityStudio.UnityEngine.Animation {
             }
         }
 
-        private readonly Dictionary<uint, string> _boneNamesMap = new Dictionary<uint, string>();
+        private protected readonly Dictionary<uint, string> _boneNamesMap = new Dictionary<uint, string>();
 
     }
 }

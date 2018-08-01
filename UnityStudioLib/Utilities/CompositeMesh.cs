@@ -17,7 +17,7 @@ namespace UnityStudio.Utilities {
         public override string Name => _name;
 
         [NotNull, ItemNotNull]
-        public IReadOnlyList<string> Names { get; internal set; }
+        public IReadOnlyList<string> Names { get; private set; }
 
         public int CompositedMeshCount { get; internal set; }
 
