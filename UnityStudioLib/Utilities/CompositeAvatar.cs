@@ -26,7 +26,7 @@ namespace UnityStudio.Utilities {
             foreach (var name in Names) {
                 sb.AppendLine();
                 sb.Append("\t");
-                sb.AppendLine(name);
+                sb.Append(name);
             }
 
             _name = sb.ToString();
