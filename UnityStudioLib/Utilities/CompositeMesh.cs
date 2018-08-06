@@ -145,6 +145,10 @@ namespace UnityStudio.Utilities {
 
             result.VertexCount = (int)vertexStart;
 
+            var shape = MergeBlendShapes(meshes);
+
+            result.Shape = shape;
+
             result.SubMeshes = subMeshList.ToArray();
             result.Indices = indexList.ToArray();
             result.MaterialIDs = materialIDList.ToArray();
@@ -158,6 +162,74 @@ namespace UnityStudio.Utilities {
             result.BoneNameHashes = boneNameHashList.ToArray();
 
             return result;
+        }
+
+        private static BlendShapeData MergeBlendShapes([NotNull, ItemNotNull] IReadOnlyList<Mesh> meshes) {
+            var vertices = new List<BlendShapeVertex>();
+            var shapes = new List<MeshBlendShape>();
+            var channels = new List<MeshBlendShapeChannel>();
+            var weights = new List<float>();
+
+            uint meshVertexIndexStart = 0;
+            var totalFrameCount = 0;
+            uint totalVertexCount = 0;
+
+            foreach (var mesh in meshes) {
+                var meshShape = mesh.Shape;
+
+                if (meshShape != null) {
+                    var channelFrameCount = 0;
+
+                    foreach (var channel in meshShape.Channels) {
+                        var chan = new MeshBlendShapeChannel();
+
+                        chan.Name = channel.Name;
+                        chan.FrameIndex = channel.FrameIndex + totalFrameCount;
+                        chan.FrameCount = channel.FrameCount;
+                        chan.NameHash = channel.NameHash;
+
+                        channelFrameCount += channel.FrameCount;
+
+                        channels.Add(chan);
+                    }
+
+                    totalFrameCount += channelFrameCount;
+
+                    weights.AddRange(meshShape.FullWeights);
+
+                    uint shapeVertexCount = 0;
+
+                    foreach (var s in meshShape.Shapes) {
+                        var shape = new MeshBlendShape();
+
+                        shape.FirstVertex = s.FirstVertex + totalVertexCount;
+                        shape.HasNormals = s.HasNormals;
+                        shape.HasTangents = s.HasTangents;
+                        shape.VertexCount = s.VertexCount;
+
+                        shapeVertexCount += s.VertexCount;
+
+                        shapes.Add(shape);
+                    }
+
+                    totalVertexCount += shapeVertexCount;
+
+                    foreach (var v in meshShape.Vertices) {
+                        var vertex = new BlendShapeVertex();
+
+                        vertex.Index = v.Index + meshVertexIndexStart;
+                        vertex.Vertex = v.Vertex;
+                        vertex.Normal = v.Normal;
+                        vertex.Tangent = v.Tangent;
+
+                        vertices.Add(vertex);
+                    }
+                }
+
+                meshVertexIndexStart += (uint)mesh.VertexCount;
+            }
+
+            return new BlendShapeData(vertices.ToArray(), shapes.ToArray(), channels.ToArray(), weights.ToArray());
         }
 
     }
