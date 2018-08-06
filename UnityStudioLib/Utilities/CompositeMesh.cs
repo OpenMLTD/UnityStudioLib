@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
@@ -18,6 +16,9 @@ namespace UnityStudio.Utilities {
 
         [NotNull, ItemNotNull]
         public IReadOnlyList<string> Names { get; private set; }
+
+        // Mapping: submesh index => name index
+        public IReadOnlyList<int> ParentMeshIndices { get; private set; }
 
         public int CompositedMeshCount { get; internal set; }
 
@@ -48,9 +49,22 @@ namespace UnityStudio.Utilities {
             var result = new CompositeMesh();
 
             result.CompositedMeshCount = meshes.Count;
-            result.Names = meshes.Select(m => m.Name).ToArray();
 
-            result.UpdateName();
+            {
+                var meshNames = new List<string>();
+
+                foreach (var m in meshes) {
+                    if (m is CompositeMesh cm) {
+                        meshNames.AddRange(cm.Names);
+                    } else {
+                        meshNames.Add(m.Name);
+                    }
+                }
+
+                result.Names = meshNames.ToArray();
+
+                result.UpdateName();
+            }
 
             var subMeshList = new List<SubMesh>();
             var indexList = new List<uint>();
@@ -64,13 +78,18 @@ namespace UnityStudio.Utilities {
             var uv1List = new List<Vector2>();
             var tangentList = new List<Vector3>();
             var boneNameHashList = new List<uint>();
+            var parentMeshIndices = new List<int>();
 
             uint vertexStart = 0;
             uint indexStart = 0;
             var boneHashStart = 0;
+            var parentMeshIndex = 0;
 
             foreach (var mesh in meshes) {
-                foreach (var subMesh in mesh.SubMeshes) {
+                var cm = mesh as CompositeMesh;
+
+                for (var i = 0; i < mesh.SubMeshes.Count; i++) {
+                    var subMesh = mesh.SubMeshes[i];
                     Debug.Assert(subMesh.Topology == MeshTopology.Triangles);
 
                     var newSubMesh = new SubMesh();
@@ -84,6 +103,18 @@ namespace UnityStudio.Utilities {
                     newSubMesh.BoundingBox = subMesh.BoundingBox;
 
                     subMeshList.Add(newSubMesh);
+
+                    if (cm != null) {
+                        parentMeshIndices.Add(parentMeshIndex + cm.ParentMeshIndices[i]);
+                    } else {
+                        parentMeshIndices.Add(parentMeshIndex);
+                    }
+                }
+
+                if (cm != null) {
+                    parentMeshIndex += cm.Names.Count;
+                } else {
+                    ++parentMeshIndex;
                 }
 
                 foreach (var index in mesh.Indices) {
@@ -160,6 +191,7 @@ namespace UnityStudio.Utilities {
             result.UV1 = uv1List.ToArray();
             result.Tangents = tangentList.ToArray();
             result.BoneNameHashes = boneNameHashList.ToArray();
+            result.ParentMeshIndices = parentMeshIndices.ToArray();
 
             return result;
         }

@@ -45,9 +45,22 @@ namespace UnityStudio.Utilities {
             var result = new CompositeAvatar();
 
             result.Size = (uint)avatars.Sum(av => av.Size);
-            result.Names = avatars.Select(av => av.Name).ToArray();
 
-            result.UpdateName();
+            {
+                var avatarNames = new List<string>();
+
+                foreach (var a in avatars) {
+                    if (a is CompositeAvatar ca) {
+                        avatarNames.AddRange(ca.Names);
+                    } else {
+                        avatarNames.Add(a.Name);
+                    }
+                }
+
+                result.Names = avatarNames.ToArray();
+
+                result.UpdateName();
+            }
 
             result.AvatarSkeleton = CombineSkeletons(avatars.Select(av => av.AvatarSkeleton));
             result.AvatarSkeletonPose = CombineSkeletonPoses(avatars.Select(av => av.AvatarSkeletonPose), avatars.Select(av => av.AvatarSkeleton));
