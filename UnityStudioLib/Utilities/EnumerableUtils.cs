@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace UnityStudio.Utilities {
     internal static class EnumerableUtils {
 
-        public static IEnumerable<(T1, T2)> Zip<T1, T2>([NotNull, ItemCanBeNull] IEnumerable<T1> e1, [NotNull, ItemCanBeNull] IEnumerable<T2> e2) {
+        public static IEnumerable<SimpleValueTuple<T1, T2>> Zip<T1, T2>([NotNull, ItemCanBeNull] IEnumerable<T1> e1, [NotNull, ItemCanBeNull] IEnumerable<T2> e2) {
             var i1 = e1.GetEnumerator();
             var i2 = e2.GetEnumerator();
 
@@ -12,7 +12,7 @@ namespace UnityStudio.Utilities {
             var m2 = i2.MoveNext();
 
             while (m1 && m2) {
-                yield return (i1.Current, i2.Current);
+                yield return new SimpleValueTuple<T1, T2>(i1.Current, i2.Current);
 
                 m1 = i1.MoveNext();
                 m2 = i2.MoveNext();

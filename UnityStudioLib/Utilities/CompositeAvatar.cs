@@ -151,7 +151,9 @@ namespace UnityStudio.Utilities {
         private static SkeletonPose CombineSkeletonPoses([NotNull, ItemNotNull] IEnumerable<SkeletonPose> poses, [NotNull, ItemNotNull] IEnumerable<Skeleton> skeletons) {
             var transformList = new List<Transform>();
 
-            foreach (var (pose, skeleton) in EnumerableUtils.Zip(poses, skeletons)) {
+            foreach (var tuple in EnumerableUtils.Zip(poses, skeletons)) {
+                var pose = tuple.Item1;
+                var skeleton = tuple.Item2;
                 var transforms = pose.Transforms;
                 var ids = skeleton.NodeIDs;
 
