@@ -182,6 +182,7 @@ namespace UnityStudio.Models {
             }
 
             AssetFileEntry[] assetFilesInMemory;
+
             using (var blocksInfoReader = new EndianBinaryReader(extraStream, Endian.BigEndian)) {
                 blocksInfoReader.Position = 0x10;
                 var blockCount = blocksInfoReader.ReadInt32();
@@ -212,14 +213,16 @@ namespace UnityStudio.Models {
                         }
                     }
 
+                    assetsDataStream.Position = 0;
+
                     using (var assetsDataReader = new EndianBinaryReader(assetsDataStream, Endian.BigEndian)) {
                         var entryCount = blocksInfoReader.ReadInt32();
-                        assetFilesInMemory = new AssetFileEntry[entryCount];
+                        var temporaryAssetFiles = new List<AssetFileEntry>();
 
                         for (var i = 0; i < entryCount; ++i) {
                             var entryOffset = blocksInfoReader.ReadInt64();
                             var entrySize = blocksInfoReader.ReadInt64();
-                            var dummy = blocksInfoReader.ReadInt32();
+                            var flags = blocksInfoReader.ReadInt32(); // My guess is: flags=0 => "empty shell"; flags!=0(==4) => real file
                             var fileName = blocksInfoReader.ReadStringToNull();
 
                             assetsDataReader.Position = entryOffset;
@@ -228,8 +231,13 @@ namespace UnityStudio.Models {
                             var memory = new MemoryStream(buf, false);
 
                             var memoryFile = new AssetFileEntry(memory, fileName, false);
-                            assetFilesInMemory[i] = memoryFile;
+
+                            if (flags != 0) {
+                                temporaryAssetFiles.Add(memoryFile);
+                            }
                         }
+
+                        assetFilesInMemory = temporaryAssetFiles.ToArray();
                     }
                 }
             }

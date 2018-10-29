@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -57,6 +59,7 @@
     <Compile Include="Extensions\AssetPlatformExtensions.cs" />
     <Compile Include="Extensions\AssetPreloadDataExtensions.cs" />
     <Compile Include="Extensions\BinaryReaderExtensions.cs" />
+    <Compile Include="Utilities\EnumerableUtils.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="External\Half.cs" />
@@ -90,32 +93,35 @@
     <Compile Include="Serialization\PopulationStrategy.cs" />
     <Compile Include="External\SevenZipHelper.cs" />
     <Compile Include="SystemEndian.cs" />
-    <Compile Include="Unity\Animation\Avatar.cs" />
-    <Compile Include="Unity\Animation\Hand.cs" />
-    <Compile Include="Unity\Animation\Human.cs" />
-    <Compile Include="Unity\Animation\Skeleton.cs" />
-    <Compile Include="Unity\Animation\SkeletonNode.cs" />
-    <Compile Include="Unity\Animation\SkeletonPose.cs" />
-    <Compile Include="Unity\Matrix4x4.cs" />
-    <Compile Include="Unity\Mesh.cs" />
-    <Compile Include="Unity\MeshParts\AABB.cs" />
-    <Compile Include="Unity\MeshParts\BlendShapeData.cs" />
-    <Compile Include="Unity\MeshParts\BlendShapeVertex.cs" />
-    <Compile Include="Unity\MeshParts\BoneInfluence.cs" />
-    <Compile Include="Unity\MeshParts\ChannelInfo.cs" />
-    <Compile Include="Unity\MeshParts\MeshBlendShape.cs" />
-    <Compile Include="Unity\MeshParts\MeshBlendShapeChannel.cs" />
-    <Compile Include="Unity\MeshParts\PackedBitVector.cs" />
-    <Compile Include="Unity\MeshParts\StreamInfo.cs" />
-    <Compile Include="Unity\MeshParts\SubMesh.cs" />
-    <Compile Include="Unity\Quaternion.cs" />
-    <Compile Include="Unity\Transform.cs" />
-    <Compile Include="Unity\MonoBehaviour.cs" />
-    <Compile Include="Unity\PPtr.cs" />
-    <Compile Include="Unity\TextAsset.cs" />
-    <Compile Include="Unity\Vector2.cs" />
-    <Compile Include="Unity\Vector3.cs" />
-    <Compile Include="Unity\Vector4.cs" />
+    <Compile Include="UnityEngine\Animation\Avatar.cs" />
+    <Compile Include="UnityEngine\Animation\Hand.cs" />
+    <Compile Include="UnityEngine\Animation\Human.cs" />
+    <Compile Include="UnityEngine\Animation\Skeleton.cs" />
+    <Compile Include="UnityEngine\Animation\SkeletonNode.cs" />
+    <Compile Include="UnityEngine\Animation\SkeletonPose.cs" />
+    <Compile Include="UnityEngine\Matrix4x4.cs" />
+    <Compile Include="UnityEngine\Mesh.cs" />
+    <Compile Include="UnityEngine\MeshParts\AABB.cs" />
+    <Compile Include="UnityEngine\MeshParts\BlendShapeData.cs" />
+    <Compile Include="UnityEngine\MeshParts\BlendShapeVertex.cs" />
+    <Compile Include="UnityEngine\MeshParts\BoneInfluence.cs" />
+    <Compile Include="UnityEngine\MeshParts\ChannelInfo.cs" />
+    <Compile Include="UnityEngine\MeshParts\MeshBlendShape.cs" />
+    <Compile Include="UnityEngine\MeshParts\MeshBlendShapeChannel.cs" />
+    <Compile Include="UnityEngine\MeshParts\MeshTopology.cs" />
+    <Compile Include="UnityEngine\MeshParts\PackedBitVector.cs" />
+    <Compile Include="UnityEngine\MeshParts\StreamInfo.cs" />
+    <Compile Include="UnityEngine\MeshParts\SubMesh.cs" />
+    <Compile Include="UnityEngine\Quaternion.cs" />
+    <Compile Include="UnityEngine\Transform.cs" />
+    <Compile Include="UnityEngine\MonoBehaviour.cs" />
+    <Compile Include="UnityEngine\PPtr.cs" />
+    <Compile Include="UnityEngine\TextAsset.cs" />
+    <Compile Include="UnityEngine\Vector2.cs" />
+    <Compile Include="UnityEngine\Vector3.cs" />
+    <Compile Include="UnityEngine\Vector4.cs" />
+    <Compile Include="Utilities\CompositeAvatar.cs" />
+    <Compile Include="Utilities\CompositeMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

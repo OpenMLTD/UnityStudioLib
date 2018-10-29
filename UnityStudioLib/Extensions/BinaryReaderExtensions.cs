@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
-using UnityStudio.Unity;
-using UnityStudio.Unity.MeshParts;
+using UnityStudio.UnityEngine;
+using UnityStudio.UnityEngine.MeshParts;
 
 namespace UnityStudio.Extensions {
     internal static class BinaryReaderExtensions {
@@ -127,6 +127,8 @@ namespace UnityStudio.Extensions {
                 shape.VertexCount = r.ReadUInt32();
                 shape.HasNormals = r.ReadBoolean();
                 shape.HasTangents = r.ReadBoolean();
+
+                r.AlignBy(4);
 
                 return shape;
             }

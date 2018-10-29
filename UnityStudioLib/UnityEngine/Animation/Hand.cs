@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace UnityStudio.Unity.Animation {
+namespace UnityStudio.UnityEngine.Animation {
     public sealed class Hand {
 
         internal Hand() {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
 
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     public sealed class MonoBehaviour : IAssetObjectContainer {
 
         internal MonoBehaviour(AssetPreloadData preloadData, bool metadataOnly) {

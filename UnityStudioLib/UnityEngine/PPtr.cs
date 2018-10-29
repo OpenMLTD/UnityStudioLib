@@ -1,4 +1,4 @@
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     public sealed class PPtr {
 
         internal PPtr(int fileID, long pathID) {

@@ -1,4 +1,4 @@
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     public sealed class Transform {
 
         public Transform() {
@@ -18,6 +18,10 @@ namespace UnityStudio.Unity {
         public Quaternion Rotation { get; set; }
 
         public Vector3 Scale { get; set; }
+
+        public override string ToString() {
+            return $"T={Translation} Q={Rotation} S={Scale}";
+        }
 
     }
 }

@@ -1,5 +1,5 @@
 using UnityStudio.Models;
-using UnityStudio.Unity;
+using UnityStudio.UnityEngine;
 
 namespace UnityStudio.Extensions {
     public static class AssetFileExtensions {

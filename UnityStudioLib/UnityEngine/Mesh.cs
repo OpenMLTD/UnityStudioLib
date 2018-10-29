@@ -7,10 +7,13 @@ using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
-using UnityStudio.Unity.MeshParts;
+using UnityStudio.UnityEngine.MeshParts;
 
-namespace UnityStudio.Unity {
-    public sealed class Mesh {
+namespace UnityStudio.UnityEngine {
+    public class Mesh {
+
+        private protected Mesh() {
+        }
 
         internal Mesh([NotNull] AssetPreloadData preloadData, bool metadataOnly) {
             var version = preloadData.Source.VersionComponents;
@@ -71,7 +74,7 @@ namespace UnityStudio.Unity {
 
                 subMesh.FirstByte = reader.ReadUInt32();
                 subMesh.IndexCount = reader.ReadUInt32(); //what is this in case of triangle strips?
-                subMesh.Topology = reader.ReadInt32(); //isTriStrip
+                subMesh.Topology = (MeshTopology)reader.ReadInt32(); //isTriStrip
 
                 if (version[0] < 4) {
                     subMesh.TriangleCount = reader.ReadUInt32();
@@ -998,10 +1001,10 @@ namespace UnityStudio.Unity {
 
                 if (SubMeshes[s].Topology == 0) {
                     for (var i = 0; i < SubMeshes[s].IndexCount / 3; i++) {
-                        _indices.Add(_indexBuffer[firstIndex + i * 3]);
-                        _indices.Add(_indexBuffer[firstIndex + i * 3 + 1]);
-                        _indices.Add(_indexBuffer[firstIndex + i * 3 + 2]);
-                        _materialIDs.Add(s);
+                        _mutableIndices.Add(_indexBuffer[firstIndex + i * 3]);
+                        _mutableIndices.Add(_indexBuffer[firstIndex + i * 3 + 1]);
+                        _mutableIndices.Add(_indexBuffer[firstIndex + i * 3 + 2]);
+                        _mutableMaterialIDs.Add(s);
                     }
                 } else {
                     uint j = 0;
@@ -1011,17 +1014,17 @@ namespace UnityStudio.Unity {
                         var fc = _indexBuffer[firstIndex + i + 2];
 
                         if ((fa != fb) && (fa != fc) && (fc != fb)) {
-                            _indices.Add(fa);
+                            _mutableIndices.Add(fa);
 
                             if ((i % 2) == 0) {
-                                _indices.Add(fb);
-                                _indices.Add(fc);
+                                _mutableIndices.Add(fb);
+                                _mutableIndices.Add(fc);
                             } else {
-                                _indices.Add(fc);
-                                _indices.Add(fb);
+                                _mutableIndices.Add(fc);
+                                _mutableIndices.Add(fb);
                             }
 
-                            _materialIDs.Add(s);
+                            _mutableMaterialIDs.Add(s);
 
                             j++;
                         }
@@ -1031,6 +1034,9 @@ namespace UnityStudio.Unity {
                     SubMeshes[s].IndexCount = j * 3;
                 }
             }
+
+            Indices = _mutableIndices;
+            MaterialIDs = _mutableMaterialIDs;
             #endregion
 
             PackedBitVector ReadPackedVector(BinaryReader r) {
@@ -1102,51 +1108,53 @@ namespace UnityStudio.Unity {
         }
 
         [NotNull]
-        public string Name { get; }
+        public virtual string Name { get; }
 
-        public IReadOnlyList<SubMesh> SubMeshes { get; }
+        public IReadOnlyList<SubMesh> SubMeshes { get; internal set; }
 
-        public IReadOnlyList<uint> Indices => _indices; //use a list because I don't always know the facecount for triangle strips
+        [NotNull]
+        public IReadOnlyList<uint> Indices { get; internal set; }
 
-        public IReadOnlyList<int> MaterialIDs => _materialIDs;
+        [NotNull]
+        public IReadOnlyList<int> MaterialIDs { get; internal set; }
 
         [NotNull, ItemNotNull]
-        public IReadOnlyList<IReadOnlyList<BoneInfluence>> Skin { get; }
+        public IReadOnlyList<IReadOnlyList<BoneInfluence>> Skin { get; internal set; }
 
         [NotNull]
-        public Matrix4x4[] BindPose { get; }
+        public Matrix4x4[] BindPose { get; internal set; }
 
-        public int VertexCount { get; }
-
-        [NotNull]
-        public Vector3[] Vertices { get; }
+        public int VertexCount { get; internal set; }
 
         [NotNull]
-        public Vector3[] Normals { get; }
+        public Vector3[] Vertices { get; internal set; }
+
+        [NotNull]
+        public Vector3[] Normals { get; internal set; }
 
         [CanBeNull]
-        public Vector4[] Colors { get; }
+        public Vector4[] Colors { get; internal set; }
 
         [NotNull]
-        public Vector2[] UV1 { get; }
+        public Vector2[] UV1 { get; internal set; }
 
         [NotNull]
-        public Vector2[] UV2 { get; }
+        public Vector2[] UV2 { get; internal set; }
 
         [CanBeNull]
-        public Vector2[] UV3 { get; }
+        public Vector2[] UV3 { get; internal set; }
 
         [CanBeNull]
-        public Vector2[] UV4 { get; }
+        public Vector2[] UV4 { get; internal set; }
 
         [CanBeNull]
-        public Vector3[] Tangents { get; }
+        public Vector3[] Tangents { get; internal set; }
 
         [NotNull]
-        public uint[] BoneNameHashes { get; }
+        public uint[] BoneNameHashes { get; internal set; }
 
         [CanBeNull]
-        public BlendShapeData Shape { get; }
+        public BlendShapeData Shape { get; internal set; }
 
         [NotNull]
         private static uint[] UnpackBitVector([NotNull] PackedBitVector packedData) {
@@ -1245,9 +1253,9 @@ namespace UnityStudio.Unity {
 
         private readonly EndianBinaryReader _reader;
 
-        private readonly List<uint> _indices = new List<uint>();
+        private readonly List<uint> _mutableIndices = new List<uint>();
 
-        private readonly List<int> _materialIDs = new List<int>();
+        private readonly List<int> _mutableMaterialIDs = new List<int>();
 
         [NotNull]
         private readonly uint[] _indexBuffer;

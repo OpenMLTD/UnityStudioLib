@@ -1,4 +1,4 @@
-namespace UnityStudio.Unity.MeshParts {
+namespace UnityStudio.UnityEngine.MeshParts {
     public sealed class MeshBlendShape {
 
         internal MeshBlendShape() {

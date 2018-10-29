@@ -2,6 +2,10 @@ using System;
 using UnityStudio.Serialization.Naming;
 
 namespace UnityStudio.Serialization {
+    /// <inheritdoc />
+    /// <summary>
+    /// Used to annotate a Unity ScriptableObject.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public sealed class MonoBehaviourAttribute : Attribute {
 

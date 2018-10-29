@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace UnityStudio.Unity {
+namespace UnityStudio.UnityEngine {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Vector3 {
 

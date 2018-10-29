@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace UnityStudio.Unity.Animation {
+namespace UnityStudio.UnityEngine.Animation {
     public sealed class Human {
 
         internal Human() {

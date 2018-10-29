@@ -1,7 +1,7 @@
 using System.Collections;
 using JetBrains.Annotations;
 
-namespace UnityStudio.Unity.MeshParts {
+namespace UnityStudio.UnityEngine.MeshParts {
     public sealed class StreamInfo {
 
         internal StreamInfo() {
