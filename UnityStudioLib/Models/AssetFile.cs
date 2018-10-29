@@ -198,8 +198,8 @@ namespace UnityStudio.Models {
                     type1 = classID;
                 }
 
-                var classIDs = _classIDs ?? (_classIDs = new List<(int Type1, int Type2)>());
-                classIDs.Add((type1, classID));
+                var classIDs = _classIDs ?? (_classIDs = new List<ClassID>());
+                classIDs.Add(new ClassID(type1, classID));
 
                 if (classID == 114) {
                     reader.Position += 16;
@@ -345,12 +345,25 @@ namespace UnityStudio.Models {
             PreloadDataList = preloadDataList;
         }
 
-        private List<(int Type1, int Type2)> _classIDs;
+        private List<ClassID> _classIDs;
 
         private readonly Dictionary<int, ClassMember> _objects = new Dictionary<int, ClassMember>();
 
         internal static readonly Regex VersionSplitter = new Regex(@"[a-z.]");
         internal static readonly Regex BuildTypePattern = new Regex(@"(\d+\.)+\d+(?<build>[A-Za-z]+)\d+");
+
+        private struct ClassID {
+
+            public ClassID(int type1, int type2) {
+                Type1 = type1;
+                Type2 = type2;
+            }
+
+            public int Type1;
+
+            public int Type2;
+
+        }
 
         private static readonly IReadOnlyDictionary<int, string> CommonStrings = new Dictionary<int, string> {
             [0] = "AABB",
