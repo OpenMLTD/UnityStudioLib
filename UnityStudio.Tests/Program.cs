@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using UnityStudio.Extensions;
@@ -41,6 +42,10 @@ namespace UnityStudio.Tests {
                     PrintHelp();
                     return;
             }
+
+            if (Debugger.IsAttached) {
+                Wait();
+            }
         }
 
         private static void ReadFumen(string fileName) {
@@ -66,8 +71,6 @@ namespace UnityStudio.Tests {
             if (scoreObj != null) {
                 Console.WriteLine("Total notes: {0}", scoreObj.NoteEvents.Length);
             }
-
-            Wait();
         }
 
         private static void ReadCostumeDatabase(string fileName) {
@@ -99,8 +102,6 @@ namespace UnityStudio.Tests {
             } else {
                 Console.WriteLine("(The asset is null, maybe the asset bundle does not contain a text asset.");
             }
-
-            Wait();
         }
 
         private static void Wait() {

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using LZ4;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
+using LZ4PCL;
 using UnityStudio.Extensions;
 
 namespace UnityStudio.Models {
@@ -69,7 +68,7 @@ namespace UnityStudio.Models {
 
             byte[] rawData;
             using (var compressedStream = new MemoryStream(compressedData, false)) {
-                using (var decoder = new LZ4Stream(compressedStream, CompressionMode.Decompress)) {
+                using (var decoder = new LZ4Stream(compressedStream, CompressionMode.Compress)) {
                     rawData = new byte[uncompressedSize];
                     decoder.Read(rawData, 0, uncompressedSize);
                 }
@@ -174,7 +173,8 @@ namespace UnityStudio.Models {
                     break;
                 case 2:
                 case 3:
-                    rawBytes = LZ4Codec.Decode(blocksInfoBytes, 0, blocksInfoBytes.Length, uncompressedSize);
+                    rawBytes = new byte[uncompressedSize];
+                    var resultSize = LZ4Codec.Decode(blocksInfoBytes, 0, blocksInfoBytes.Length, rawBytes, 0, uncompressedSize);
                     extraStream = new MemoryStream(rawBytes, false);
                     break;
                 default:
@@ -203,7 +203,8 @@ namespace UnityStudio.Models {
                                 break;
                             case 2:
                             case 3:
-                                uncompressedBytes = LZ4Codec.Decode(compressedBytes, 0, compressedBytes.Length, uncompressedSize);
+                                uncompressedBytes = new byte[uncompressedSize];
+                                var resultSize = LZ4Codec.Decode(compressedBytes, 0, compressedBytes.Length, uncompressedBytes, 0, uncompressedSize);
                                 assetsDataStream.Write(uncompressedBytes, 0, uncompressedSize);
                                 break;
                             default:
