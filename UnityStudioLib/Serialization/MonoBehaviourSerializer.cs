@@ -9,6 +9,8 @@ using UnityStudio.Extensions;
 using UnityStudio.Models;
 using UnityStudio.Serialization.Naming;
 using UnityStudio.UnityEngine;
+using UnityStudio.Utilities;
+using PropOrField = UnityStudio.Utilities.MemberSetter;
 
 namespace UnityStudio.Serialization {
     public sealed class MonoBehaviourSerializer {
@@ -65,7 +67,7 @@ namespace UnityStudio.Serialization {
                     continue;
                 }
 
-                var propOrField = FindByName(properties, fields, kv.Key, naming);
+                var propOrField = FindByName(type, properties, fields, kv.Key, naming);
                 if (!propOrField.IsValid) {
                     if (monoBehaviorAttr.ThrowOnUnmatched) {
                         throw new SerializationException();
@@ -182,7 +184,7 @@ namespace UnityStudio.Serialization {
                     if (serializedValueType == acceptedType) {
                         propOrField.SetValue(obj, kv.Value);
                     } else {
-                        // A little convertion is needed here...
+                        // A little conversion is needed here...
                         var converted = false;
 
                         // Is the situation: target type is an enum, recorded type is a integer type?
@@ -253,24 +255,46 @@ namespace UnityStudio.Serialization {
             return obj;
         }
 
-        private static PropertyOrField FindByName(IReadOnlyList<PropertyInfo> properties, IReadOnlyList<FieldInfo> fields, string name, INamingConvention namingConvention) {
+        private PropOrField FindByName([NotNull] Type objectType, [NotNull, ItemNotNull] IReadOnlyList<PropertyInfo> properties, [NotNull, ItemNotNull] IReadOnlyList<FieldInfo> fields, string name, INamingConvention namingConvention) {
+            PropOrField result;
+
             foreach (var prop in properties) {
                 var mbp = prop.GetCustomAttribute<MonoBehaviourPropertyAttribute>();
                 var propName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(prop.Name) : prop.Name);
+
                 if (propName == name) {
-                    return new PropertyOrField(prop, mbp);
+                    var key = new SimpleValueTuple<Type, string, MonoBehaviourPropertyAttribute>(objectType, propName, mbp);
+
+                    if (_createdSetters.ContainsKey(key)) {
+                        result = _createdSetters[key];
+                    } else {
+                        result = new PropOrField(prop, mbp);
+                        _createdSetters[key] = result;
+                    }
+
+                    return result;
                 }
             }
 
             foreach (var field in fields) {
                 var mbp = field.GetCustomAttribute<MonoBehaviourPropertyAttribute>();
                 var fieldName = !string.IsNullOrEmpty(mbp?.Name) ? mbp.Name : (namingConvention != null ? namingConvention.GetCorrected(field.Name) : field.Name);
+
                 if (fieldName == name) {
-                    return new PropertyOrField(field, mbp);
+                    var key = new SimpleValueTuple<Type, string, MonoBehaviourPropertyAttribute>(objectType, fieldName, mbp);
+
+                    if (_createdSetters.ContainsKey(key)) {
+                        result = _createdSetters[key];
+                    } else {
+                        result = new PropOrField(field, mbp);
+                        _createdSetters[key] = result;
+                    }
+
+                    return result;
                 }
             }
 
-            return new PropertyOrField();
+            return PropOrField.Null;
         }
 
         private const BindingFlags InternalBindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -279,62 +303,14 @@ namespace UnityStudio.Serialization {
 
         private readonly Dictionary<Type, ISimpleTypeConverter> _createdTypeConverters = new Dictionary<Type, ISimpleTypeConverter>(10);
 
+        private readonly Dictionary<SimpleValueTuple<Type, string, MonoBehaviourPropertyAttribute>, PropOrField> _createdSetters = new Dictionary<SimpleValueTuple<Type, string, MonoBehaviourPropertyAttribute>, PropOrField>();
+
         private static readonly string[] FilteredNames = {
             "m_GameObject",
             "m_Enabled",
             "m_Script",
             "m_Name"
         };
-
-        private struct PropertyOrField {
-
-            internal PropertyOrField(FieldInfo field, MonoBehaviourPropertyAttribute attribute) {
-                Field = field;
-                Property = null;
-                IsValid = true;
-                Attribute = attribute;
-            }
-
-            internal PropertyOrField(PropertyInfo property, MonoBehaviourPropertyAttribute attribute) {
-                Field = null;
-                Property = property;
-                IsValid = true;
-                Attribute = attribute;
-            }
-
-            internal void SetValue(object @this, object value) {
-                if (!IsValid) {
-                    throw new InvalidOperationException();
-                }
-                Property?.SetValue(@this, value);
-                Field?.SetValue(@this, value);
-            }
-
-            internal Type GetValueType() {
-                if (!IsValid) {
-                    throw new InvalidOperationException();
-                }
-                if (Property != null) {
-                    return Property.PropertyType;
-                }
-                if (Field != null) {
-                    return Field.FieldType;
-                }
-                throw new InvalidOperationException();
-            }
-
-            internal bool IsValid { get; }
-
-            [CanBeNull]
-            internal FieldInfo Field { get; }
-
-            [CanBeNull]
-            internal PropertyInfo Property { get; }
-
-            [CanBeNull]
-            internal MonoBehaviourPropertyAttribute Attribute { get; }
-
-        }
 
     }
 }

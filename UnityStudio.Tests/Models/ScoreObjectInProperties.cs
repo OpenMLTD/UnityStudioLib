@@ -1,9 +1,9 @@
 using UnityStudio.Serialization;
 using UnityStudio.Serialization.Naming;
 
-namespace UnityStudio.Tests {
+namespace UnityStudio.Tests.Models {
     [MonoBehaviour(NamingConventionType = typeof(CamelCaseNamingConvention))]
-    public sealed class ScoreObject {
+    public sealed class ScoreObjectInProperties {
 
         [MonoBehaviourProperty(Name = "evts")]
         public EventNoteData[] NoteEvents { get; set; }

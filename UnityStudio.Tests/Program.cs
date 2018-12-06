@@ -5,6 +5,8 @@ using System.Reflection;
 using UnityStudio.Extensions;
 using UnityStudio.Models;
 using UnityStudio.Serialization;
+// You can compare the performance with ScoreObjectInFields
+using ScrObj = UnityStudio.Tests.Models.ScoreObjectInProperties;
 
 namespace UnityStudio.Tests {
     internal static class Program {
@@ -31,6 +33,8 @@ namespace UnityStudio.Tests {
                 return;
             }
 
+            CodeTimer.Initialize();
+
             switch (mode) {
                 case "fumen":
                     ReadFumen(fileName);
@@ -49,7 +53,7 @@ namespace UnityStudio.Tests {
         }
 
         private static void ReadFumen(string fileName) {
-            ScoreObject scoreObj = null;
+            ScrObj scoreObj = null;
             using (var fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 using (var bundle = new BundleFile(fileStream, false)) {
                     foreach (var assetFile in bundle.AssetFiles) {
@@ -59,7 +63,10 @@ namespace UnityStudio.Tests {
                                 if (behaviour.Name.Contains("fumen")) {
                                     behaviour = preloadData.LoadAsMonoBehaviour(false);
                                     var serializer = new MonoBehaviourSerializer();
-                                    scoreObj = serializer.Deserialize<ScoreObject>(behaviour);
+                                    CodeTimer.Time($"Deserialize scrobj to {typeof(ScrObj).Name}", 10, () => {
+                                        var _ = serializer.Deserialize<ScrObj>(behaviour);
+                                    });
+                                    scoreObj = serializer.Deserialize<ScrObj>(behaviour);
                                     break;
                                 }
                             }

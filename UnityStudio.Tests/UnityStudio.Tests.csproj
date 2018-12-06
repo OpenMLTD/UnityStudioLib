@@ -41,10 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeTimer.cs" />
     <Compile Include="DoubleToSingleConverter.cs" />
+    <Compile Include="Models\ScoreObjectInFields.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScoreObject.cs" />
+    <Compile Include="Models\ScoreObjectInProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

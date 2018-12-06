@@ -122,6 +122,10 @@
     <Compile Include="UnityEngine\Vector4.cs" />
     <Compile Include="Utilities\CompositeAvatar.cs" />
     <Compile Include="Utilities\CompositeMesh.cs" />
+    <Compile Include="Utilities\HashCode.cs" />
+    <Compile Include="Utilities\MemberSetter.cs" />
+    <Compile Include="Utilities\PropertyOrField.cs" />
+    <Compile Include="Utilities\SimpleValueTuple`3.cs" />
     <Compile Include="Utilities\SimpleValueTuple`2.cs" />
   </ItemGroup>
   <ItemGroup>
