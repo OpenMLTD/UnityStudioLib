@@ -142,6 +142,17 @@ namespace UnityStudio.Utilities {
                     skinList.Add(s);
                 }
 
+                // Some vertex do not bind to a bone (e.g. 100 vertices & 90 bone influences),
+                // so we have to fill the gap ourselves, or this will influence the meshes
+                // combined after current mesh.
+                if (mesh.Skin.Count < mesh.VertexCount) {
+                    var difference = mesh.VertexCount - mesh.Skin.Count;
+
+                    for (var i = 0; i < difference; ++i) {
+                        skinList.Add(new BoneInfluence[4]);
+                    }
+                }
+
                 materialIDList.AddRange(mesh.MaterialIDs);
 
                 boneNameHashList.AddRange(mesh.BoneNameHashes);
