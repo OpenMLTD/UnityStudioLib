@@ -1,5 +1,11 @@
 # UnityStudioLib
 
+**Now obsolete.** Use the [core library](https://github.com/Perfare/AssetStudio/tree/master/AssetStudio) instead.
+If you feel inconvenient using that, please send a PR to that repo to urge a better design.
+Alternatively, you can write a bunch of glue code to make your life easier, like in MLTDTools. :D
+
+------
+
 Packing [Unity Studio](https://github.com/Perfare/UnityStudio) into a class library.
 Only essential parts are implemented.
 
